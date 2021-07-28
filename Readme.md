@@ -1,7 +1,7 @@
 # Проект «Большое путешествие»
 
 * Студент: [Станислав](https://up.htmlacademy.ru/ecmascript/15/user/1593103).
-* Наставник: [Сергей Шрамко] (https://htmlacademy.ru/profile/id852139).
+* Наставник: [Сергей Шрамко](https://htmlacademy.ru/profile/id852139).
 
 ---
 
