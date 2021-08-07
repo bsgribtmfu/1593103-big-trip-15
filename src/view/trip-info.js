@@ -1,8 +1,8 @@
-import { sortBy } from '../utils.js';
+import { sortByDate } from '../utils.js';
 import dayjs from "dayjs";
 
 const findPoints = (points) => { // может эту ф-ю закинуть в utils.js ?
-  const sortedPointsByDates = sortBy(points, { prop: 'date_from' });
+  const sortedPointsByDates = sortByDate(points);
 
   return {
     startPoint: sortedPointsByDates[0].destination.name,
