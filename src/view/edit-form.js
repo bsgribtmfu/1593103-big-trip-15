@@ -1,4 +1,4 @@
-import dayjs from "dayjs";
+import dayjs from 'dayjs';
 
 const getLastWord = (offer) => { // может эту ф-ю закинуть в utils.js ?
   const words = offer.split(' ');

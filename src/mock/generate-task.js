@@ -1,5 +1,5 @@
 import { getRandomIntInclusive, genRandomItemFrom } from '../utils.js';
-const dayjs = require('dayjs');
+import dayjs from "dayjs";
 
 const generateOffers = (titles, price) => {
 

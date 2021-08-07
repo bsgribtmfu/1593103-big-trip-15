@@ -2,13 +2,6 @@ import { CITIES, TYPES, BASEPRICE, TITLES, PRICE, IMAGEDESCRIPTION } from './con
 import { generateTitle, generateOffers, generatePictures, generateFromToDate } from './generate-task.js';
 import { getRandomIntInclusive, genRandomItemFrom } from '../utils.js';
 
-const generateOffer = () => (
-  {
-    'type': genRandomItemFrom(TYPES),
-    'offers': generateOffers(TITLES, PRICE),
-  }
-);
-
 const generateDistanation = () => (
   {
     'description': generateTitle(),

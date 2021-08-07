@@ -1,5 +1,5 @@
 import { sortByDate } from '../utils.js';
-import dayjs from "dayjs";
+import dayjs from 'dayjs';
 
 const findPoints = (points) => { // может эту ф-ю закинуть в utils.js ?
   const sortedPointsByDates = sortByDate(points);
@@ -18,7 +18,7 @@ export const tripInfo = (points) => {
   const { startPoint, endPoint, throughPoint, startDate, endDate }  = findPoints(points);
 
   const costValueDefinition = points
-    .map(point => point.base_price)
+    .map((point) => point.base_price)
     .reduce((sum, price) => sum + price);
 
   return (

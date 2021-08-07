@@ -1,4 +1,4 @@
-import dayjs from "dayjs";
+import dayjs from 'dayjs';
 
 const getRandomIntInclusive = (min, max) => {
   min = Math.ceil(min);

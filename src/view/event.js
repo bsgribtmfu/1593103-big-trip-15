@@ -1,7 +1,7 @@
 import { genRandomItemFrom } from '../utils.js';
 
-import dayjs from "dayjs";
-import duration from "dayjs/plugin/duration";
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
 
 dayjs.extend(duration); // куда это запихнуть? в ф-ю нельзя, этой штуке нужна глобальная область видимости.
 
