@@ -1,6 +1,4 @@
-import dayjs from 'dayjs';
-
-import { sortByDate } from '../utils.js';
+import { sortByDate, humanizeTaskDate } from '../utils.js';
 
 const findPoints = (points) => {
   const sortedPointsByDates = sortByDate(points);
@@ -27,7 +25,7 @@ const tripInfo = (points) => {
     <div class="trip-info__main">
       <h1 class="trip-info__title">${startPoint} &mdash; ${throughPoint} &mdash; ${endPoint}</h1>
 
-      <p class="trip-info__dates">${dayjs(startDate).format('MMM DD')}&nbsp;&mdash;&nbsp;${dayjs(endDate).format('MMM DD')}.</p>
+      <p class="trip-info__dates">${humanizeTaskDate(startDate, 'MMM DD')}&nbsp;&mdash;&nbsp;${humanizeTaskDate(endDate, 'MMM DD')}.</p>
     </div>
 
     <p class="trip-info__cost">

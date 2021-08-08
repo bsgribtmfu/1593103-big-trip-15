@@ -1,6 +1,4 @@
-import dayjs from 'dayjs';
-
-import { getLastWord } from '../utils.js';
+import { getLastWord, humanizeTaskDate } from '../utils.js';
 
 const generateDestinationPhotos = (pictures) => {
 
@@ -132,10 +130,10 @@ const editForm = (point) => {
 
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dayjs(dateFrom).format('DD/MM/YY')} ${dayjs(dateFrom).format('HH:MM')}">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizeTaskDate(dateFrom, 'DD/MM/YY')} ${humanizeTaskDate(dateFrom, 'HH:MM')}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dayjs(dateTo).format('DD/MM/YY')} ${dayjs(dateTo).format('HH:MM')}">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizeTaskDate(dateTo, 'DD/MM/YY')} ${humanizeTaskDate(dateTo, 'HH:MM')}">
         </div>
 
         <div class="event__field-group  event__field-group--price">

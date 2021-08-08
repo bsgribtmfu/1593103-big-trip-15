@@ -1,11 +1,6 @@
-import dayjs from 'dayjs';
-import duration from 'dayjs/plugin/duration';
+import { genRandomItemFrom, differenceDate, humanizeTaskDate } from '../utils.js';
 
-import { genRandomItemFrom, differenceDate } from '../utils.js';
-
-dayjs.extend(duration); // куда это запихнуть? в ф-ю нельзя, этой штуке нужна глобальная область видимости.
-
-export const event = (point) => {
+const event = (point) => {
   const {
     base_price: basePrice,
     date_from: dateFrom,
@@ -28,18 +23,18 @@ export const event = (point) => {
 
   return (
     `<div class="event">
-    <time class="event__date" datetime="${dayjs(dateFrom).format('YYYY-MM-DD')}">${dayjs(dateFrom).format('DD MMM')}</time>
+    <time class="event__date" datetime="${humanizeTaskDate(dateFrom, 'YYYY-MM-DD')}">${humanizeTaskDate(dateFrom, 'DD MMM')}</time>
     <div class="event__type">
       <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event ${type} icon">
     </div>
     <h3 class="event__title">${type} ${name}</h3>
     <div class="event__schedule">
       <p class="event__time">
-        <time class="event__start-time" datetime="${dayjs(dateFrom).format('YYYY-MM-DD')}">${dayjs(dateFrom).format('HH:MM')}</time>
+        <time class="event__start-time" datetime="${humanizeTaskDate(dateFrom, 'YYYY-MM-DD')}">${humanizeTaskDate(dateFrom, 'HH:MM')}</time>
         &mdash;
-        <time class="event__end-time" datetime="${dayjs(dateTo).format('YYYY-MM-DD')}">${dayjs(dateTo).format('HH:MM')}</time>
+        <time class="event__end-time" datetime="${humanizeTaskDate(dateTo, 'YYYY-MM-DD')}">${humanizeTaskDate(dateTo, 'HH:MM')}</time>
       </p>
-      <p class="event__duration">${diffDate.$d.hours}H ${diffDate.$d.minutes}M</p>
+      <p class="event__duration">${humanizeTaskDate(diffDate, 'HH[H] mm[M]')}</p>
     </div>
     <p class="event__price">
       &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
@@ -64,3 +59,5 @@ export const event = (point) => {
   </div>`
   );
 };
+
+export { event };
