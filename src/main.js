@@ -6,6 +6,7 @@ import { event } from './view/event.js';
 import { editForm } from './view/edit-form.js';
 import { addForm } from './view/add-form.js';
 import { generatePoint } from './mock/data-structure.js';
+import { render } from './utils.js';
 
 const tripMain = document.querySelector('.trip-main');
 const tripNavigation = document.querySelector('.trip-controls__navigation');
@@ -25,10 +26,6 @@ const generatePoints = (count) => {
 };
 
 const points = generatePoints(POINT_COUNT);
-
-const render = (element, position, template) => {
-  element.insertAdjacentHTML(position, template);
-};
 
 const eventsList = () => (
   `<ul class="trip-events__list">

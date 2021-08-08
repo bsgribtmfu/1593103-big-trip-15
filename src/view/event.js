@@ -1,16 +1,9 @@
-import { genRandomItemFrom } from '../utils.js';
-
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 
+import { genRandomItemFrom, differenceDate } from '../utils.js';
+
 dayjs.extend(duration); // куда это запихнуть? в ф-ю нельзя, этой штуке нужна глобальная область видимости.
-
-const differenceDate = (dateFrom, dateTo) => { // может эту ф-ю закинуть в utils.js ?
-  const from = dayjs(dateFrom);
-  const to = dayjs(dateTo);
-
-  return dayjs.duration(to.diff(from));
-};
 
 export const event = (point) => {
   const {
@@ -28,7 +21,8 @@ export const event = (point) => {
   const diffDate = differenceDate(dateFrom, dateTo);
 
   const offer = genRandomItemFrom(offers);
-  const { title: offerTitle, price: offerPrice } = offer;
+
+  const { title, price } = offer;
 
   const buttonFavorite = isFavorite !== false || 'event__favorite-btn--active';
 
@@ -53,9 +47,9 @@ export const event = (point) => {
     <h4 class="visually-hidden">Offers:</h4>
     <ul class="event__selected-offers">
       <li class="event__offer">
-        <span class="event__offer-title">${offerTitle}</span>
+        <span class="event__offer-title">${title}</span>
         &plus;&euro;&nbsp;
-        <span class="event__offer-price">${offerPrice}</span>
+        <span class="event__offer-price">${price}</span>
       </li>
     </ul>
     <button class="event__favorite-btn ${buttonFavorite}" type="button">

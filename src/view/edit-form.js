@@ -1,9 +1,6 @@
 import dayjs from 'dayjs';
 
-const getLastWord = (offer) => { // может эту ф-ю закинуть в utils.js ?
-  const words = offer.split(' ');
-  return words[words.length - 1];
-};
+import { getLastWord } from '../utils.js';
 
 const generateDestinationPhotos = (pictures) => {
 
@@ -18,7 +15,7 @@ const generateDestinationPhotos = (pictures) => {
   );
 };
 
-const genarateOffers = (offers) => {
+const renderOffers = (offers) => {
 
   const offersElements = offers.map((offerItem) => {
     const word = getLastWord(offerItem.title);
@@ -51,7 +48,7 @@ const editForm = (point) => {
     type,
   } = point;
 
-  const offersElements = genarateOffers(offers);
+  const offersElements = renderOffers(offers);
   const destinationPhotos = generateDestinationPhotos(pictures);
 
   return (

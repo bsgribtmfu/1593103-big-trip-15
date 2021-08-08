@@ -1,7 +1,8 @@
-import { sortByDate } from '../utils.js';
 import dayjs from 'dayjs';
 
-const findPoints = (points) => { // может эту ф-ю закинуть в utils.js ?
+import { sortByDate } from '../utils.js';
+
+const findPoints = (points) => {
   const sortedPointsByDates = sortByDate(points);
 
   return {
@@ -13,7 +14,7 @@ const findPoints = (points) => { // может эту ф-ю закинуть в 
   };
 };
 
-export const tripInfo = (points) => {
+const tripInfo = (points) => {
 
   const { startPoint, endPoint, throughPoint, startDate, endDate }  = findPoints(points);
 
@@ -35,3 +36,5 @@ export const tripInfo = (points) => {
   </section>`
   );
 };
+
+export { tripInfo };
