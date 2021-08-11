@@ -14,10 +14,6 @@ const genRandomItemFrom = (array) => {
   return array[randomIndex];
 };
 
-const render = (element, position, template) => {
-  element.insertAdjacentHTML(position, template);
-};
-
 const getLastWord = (offer) => {
   const words = offer.split(' ');
   return words[words.length - 1];
@@ -34,4 +30,38 @@ const sortByDate = (points) => points.sort((a, b) => dayjs(a.date_from) - dayjs(
 
 const humanizeTaskDate = (date, format) => dayjs(date).format(format);
 
-export { getRandomIntInclusive, genRandomItemFrom, sortByDate, render, getLastWord, differenceDate, humanizeTaskDate };
+const RenderPosition = {
+  AFTERBEGIN: 'afterbegin',
+  BEFOREEND:  'beforeend',
+};
+
+const render = (container, element, place) => {
+  switch (place) {
+    case RenderPosition.AFTERBEGIN:
+      container.prepend(element);
+      break;
+
+    case RenderPosition.BEFOREEND:
+      container.append(element);
+      break;
+  }
+};
+
+const createElement = (template) => {
+  const newElement = document.createElement('div');
+  newElement.innerHTML = template;
+
+  return newElement.firstChild;
+};
+
+export {
+  getRandomIntInclusive,
+  genRandomItemFrom,
+  sortByDate,
+  getLastWord,
+  differenceDate,
+  humanizeTaskDate,
+  RenderPosition,
+  render,
+  createElement
+};

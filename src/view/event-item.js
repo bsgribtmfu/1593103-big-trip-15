@@ -1,19 +1,14 @@
 import { createElement } from '../utils.js';
 
-const generateNavigation = () => (
-  `<nav class="trip-controls__trip-tabs trip-tabs">
-    <a class="trip-tabs__btn" href="#">Table</a>
-    <a class="trip-tabs__btn  trip-tabs__btn--active" href="#">Stats</a>
-  </nav>`
-);
+const generateItem = () => '<li class="trip-events__item"></li>';
 
-export default class Navigation {
+export default class EventItem {
   constructor () {
     this._element = null;
   }
 
   getTemplate() {
-    return generateNavigation();
+    return generateItem();
   }
 
   getElement() {

@@ -1,4 +1,4 @@
-import { sortByDate, humanizeTaskDate } from '../utils.js';
+import { sortByDate, humanizeTaskDate, createElement } from '../utils.js';
 
 const findPoints = (points) => {
   const sortedPointsByDates = sortByDate(points);
@@ -12,7 +12,7 @@ const findPoints = (points) => {
   };
 };
 
-const tripInfo = (points) => {
+const generatetripInfo = (points) => {
 
   const { startPoint, endPoint, throughPoint, startDate, endDate }  = findPoints(points);
 
@@ -35,4 +35,26 @@ const tripInfo = (points) => {
   );
 };
 
-export { tripInfo };
+
+export default class TripInfo {
+  constructor (point) {
+    this._point = point;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return generatetripInfo(this._point);
+  }
+
+  getElement() {
+    if(!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

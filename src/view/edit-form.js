@@ -1,4 +1,4 @@
-import { getLastWord, humanizeTaskDate } from '../utils.js';
+import { getLastWord, humanizeTaskDate, createElement } from '../utils.js';
 
 const generateDestinationPhotos = (pictures) => {
 
@@ -33,12 +33,13 @@ const renderOffers = (offers) => {
   return offersElements;
 };
 
-const editForm = (point) => {
+const generateForm = (point) => {
   const {
     base_price: basePrice,
     date_from: dateFrom,
     date_to: dateTo,
     destination: {
+      name,
       description,
       pictures,
     },
@@ -120,11 +121,11 @@ const editForm = (point) => {
           <label class="event__label  event__type-output" for="event-destination-1">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="Chamonix" list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${name}" list="destination-list-1">
           <datalist id="destination-list-1">
             <option value="Amsterdam"></option>
             <option value="Geneva"></option>
-            <option value="Chamonix"></option>
+            <option value="${name}"></option>
           </datalist>
         </div>
 
@@ -170,4 +171,26 @@ const editForm = (point) => {
   );
 };
 
-export { editForm };
+export default class editForm {
+  constructor (point) {
+    this._point = point;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return generateForm(this._point);
+  }
+
+  getElement() {
+    if(!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
