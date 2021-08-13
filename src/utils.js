@@ -28,7 +28,7 @@ const differenceDate = (dateFrom, dateTo) => {
 
 const sortByDate = (points) => points.sort((a, b) => dayjs(a.date_from) - dayjs(b.date_from));
 
-const humanizeTaskDate = (date, format) => dayjs(date).format(format);
+const humanizeEventDate = (date, format) => dayjs(date).format(format);
 
 const RenderPosition = {
   AFTERBEGIN: 'afterbegin',
@@ -60,7 +60,7 @@ export {
   sortByDate,
   getLastWord,
   differenceDate,
-  humanizeTaskDate,
+  humanizeEventDate,
   RenderPosition,
   render,
   createElement

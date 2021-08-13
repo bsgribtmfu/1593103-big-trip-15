@@ -1,6 +1,6 @@
-import { genRandomItemFrom, differenceDate, humanizeTaskDate, createElement } from '../utils.js';
+import { genRandomItemFrom, differenceDate, humanizeEventDate, createElement } from '../utils.js';
 
-const createEvent = (point) => {
+const generateEvent = (event) => {
   const {
     base_price: basePrice,
     date_from: dateFrom,
@@ -11,7 +11,7 @@ const createEvent = (point) => {
     is_favorite: isFavorite,
     offers,
     type,
-  } = point;
+  } = event;
 
   const diffDate = differenceDate(dateFrom, dateTo);
 
@@ -23,18 +23,18 @@ const createEvent = (point) => {
 
   return (
     `<div class="event">
-      <time class="event__date" datetime="${humanizeTaskDate(dateFrom, 'YYYY-MM-DD')}">${humanizeTaskDate(dateFrom, 'DD MMM')}</time>
+      <time class="event__date" datetime="${humanizeEventDate(dateFrom, 'YYYY-MM-DD')}">${humanizeEventDate(dateFrom, 'DD MMM')}</time>
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event ${type} icon">
       </div>
       <h3 class="event__title">${type} ${name}</h3>
       <div class="event__schedule">
         <p class="event__time">
-          <time class="event__start-time" datetime="${humanizeTaskDate(dateFrom, 'YYYY-MM-DD')}">${humanizeTaskDate(dateFrom, 'HH:MM')}</time>
+          <time class="event__start-time" datetime="${humanizeEventDate(dateFrom, 'YYYY-MM-DD')}">${humanizeEventDate(dateFrom, 'HH:MM')}</time>
           &mdash;
-          <time class="event__end-time" datetime="${humanizeTaskDate(dateTo, 'YYYY-MM-DD')}">${humanizeTaskDate(dateTo, 'HH:MM')}</time>
+          <time class="event__end-time" datetime="${humanizeEventDate(dateTo, 'YYYY-MM-DD')}">${humanizeEventDate(dateTo, 'HH:MM')}</time>
         </p>
-        <p class="event__duration">${humanizeTaskDate(diffDate, 'HH[H] mm[M]')}</p>
+        <p class="event__duration">${humanizeEventDate(diffDate, 'HH[H] mm[M]')}</p>
       </div>
       <p class="event__price">
         &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
@@ -61,13 +61,13 @@ const createEvent = (point) => {
 };
 
 export default class Event {
-  constructor (point) {
-    this._point = point;
+  constructor (event) {
+    this._event = event;
     this._element = null;
   }
 
   getTemplate() {
-    return createEvent(this._point);
+    return generateEvent(this._event);
   }
 
   getElement() {

@@ -1,7 +1,4 @@
-// import { editForm } from './view/edit-form.js';
-// import { addForm } from './view/add-form.js';
-
-import { generatePoint } from './mock/data-structure.js';
+import { generateEvent } from './mock/data-structure.js';
 import { render, RenderPosition } from './utils.js';
 
 import TripInfo from './view/trip-info.js';
@@ -20,17 +17,17 @@ const tripEvents = document.querySelector('.trip-events');
 
 const POINT_COUNT = 20;
 
-const generatePoints = (count) => {
-  const pointsElements = [];
+const generateEvents = (count) => {
+  const eventElements = [];
 
   for (let i = 0; i < count; i++) {
-    pointsElements.push(generatePoint());
+    eventElements.push(generateEvent());
   }
 
-  return pointsElements;
+  return eventElements;
 };
 
-const points = generatePoints(POINT_COUNT);
+const events = generateEvents(POINT_COUNT);
 
 const replaceElement = (parentNode, newChild, oldChild) => {
   parentNode.replaceChild(newChild, oldChild);
@@ -44,7 +41,7 @@ const renderEvent = (eventItem, point) => {
 
   editFormComponent.getElement().querySelector('.event__reset-btn').addEventListener('click', () => {
     eventItem.remove();
-    // eventItem.removeElement(); // не работает :(
+    editFormComponent.removeElement();
   });
 
   const onEscKeyDown = (evt) => {
@@ -71,22 +68,22 @@ const renderEvent = (eventItem, point) => {
   });
 };
 
-const renderEventsList = (container, pointsObject) => {
+const renderEventsList = (container, eventsObject) => {
   const eventList = new EventsList();
 
   render(container, eventList.getElement(), RenderPosition.BEFOREEND);
 
-  pointsObject.map((point) => {
+  eventsObject.map((event) => {
     const eventItem = new EventItem();
 
     render(eventList.getElement(), eventItem.getElement(), RenderPosition.BEFOREEND); // ренедерим <li>
-    renderEvent(eventItem.getElement(), point); // ренедерим points и навешиваем события на кнопку каждой точки.
+    renderEvent(eventItem.getElement(), event); // ренедерим points и навешиваем события на кнопку каждой точки.
   });
 };
 
-render(tripMain, new TripInfo(points).getElement(), RenderPosition.AFTERBEGIN);
+render(tripMain, new TripInfo(events).getElement(), RenderPosition.AFTERBEGIN);
 render(tripNavigation, new Navigation().getElement(), RenderPosition.BEFOREEND);
 render(tripControlsFilters, new FilterTemplate().getElement(), RenderPosition.BEFOREEND);
 render(tripEvents, new Sort().getElement(), RenderPosition.BEFOREEND);
 
-renderEventsList(tripEvents, points);
+renderEventsList(tripEvents, events);

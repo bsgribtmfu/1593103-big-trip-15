@@ -1,4 +1,4 @@
-import { getLastWord, humanizeTaskDate, createElement } from '../utils.js';
+import { getLastWord, humanizeEventDate, createElement } from '../utils.js';
 
 const generateDestinationPhotos = (pictures) => {
 
@@ -13,7 +13,7 @@ const generateDestinationPhotos = (pictures) => {
   );
 };
 
-const renderOffers = (offers) => {
+const generateOffers = (offers) => {
 
   const offersElements = offers.map((offerItem) => {
     const word = getLastWord(offerItem.title);
@@ -33,7 +33,7 @@ const renderOffers = (offers) => {
   return offersElements;
 };
 
-const generateForm = (point) => {
+const generateForm = (event) => {
   const {
     base_price: basePrice,
     date_from: dateFrom,
@@ -45,9 +45,9 @@ const generateForm = (point) => {
     },
     offers,
     type,
-  } = point;
+  } = event;
 
-  const offersElements = renderOffers(offers);
+  const offersElements = generateOffers(offers);
   const destinationPhotos = generateDestinationPhotos(pictures);
 
   return (
@@ -131,10 +131,10 @@ const generateForm = (point) => {
 
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizeTaskDate(dateFrom, 'DD/MM/YY')} ${humanizeTaskDate(dateFrom, 'HH:MM')}">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizeEventDate(dateFrom, 'DD/MM/YY')} ${humanizeEventDate(dateFrom, 'HH:MM')}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizeTaskDate(dateTo, 'DD/MM/YY')} ${humanizeTaskDate(dateTo, 'HH:MM')}">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizeEventDate(dateTo, 'DD/MM/YY')} ${humanizeEventDate(dateTo, 'HH:MM')}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -172,13 +172,13 @@ const generateForm = (point) => {
 };
 
 export default class editForm {
-  constructor (point) {
-    this._point = point;
+  constructor (event) {
+    this._event = event;
     this._element = null;
   }
 
   getTemplate() {
-    return generateForm(this._point);
+    return generateForm(this._event);
   }
 
   getElement() {
