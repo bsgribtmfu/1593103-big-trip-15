@@ -15,7 +15,7 @@ const tripNavigation = document.querySelector('.trip-controls__navigation');
 const tripControlsFilters = document.querySelector('.trip-controls__filters');
 const tripEvents = document.querySelector('.trip-events');
 
-const POINT_COUNT = 20;
+const EVENT_COUNT = 20;
 
 const generateEvents = (count) => {
   const eventElements = [];
@@ -27,7 +27,7 @@ const generateEvents = (count) => {
   return eventElements;
 };
 
-const events = generateEvents(POINT_COUNT);
+const events = generateEvents(EVENT_COUNT);
 
 const replaceElement = (parentNode, newChild, oldChild) => {
   parentNode.replaceChild(newChild, oldChild);
