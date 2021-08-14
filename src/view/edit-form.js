@@ -1,4 +1,4 @@
-import { getLastWord, humanizeTaskDate } from '../utils.js';
+import { getLastWord, humanizeEventDate, createElement } from '../utils.js';
 
 const generateDestinationPhotos = (pictures) => {
 
@@ -13,7 +13,7 @@ const generateDestinationPhotos = (pictures) => {
   );
 };
 
-const renderOffers = (offers) => {
+const generateOffers = (offers) => {
 
   const offersElements = offers.map((offerItem) => {
     const word = getLastWord(offerItem.title);
@@ -33,20 +33,21 @@ const renderOffers = (offers) => {
   return offersElements;
 };
 
-const editForm = (point) => {
+const generateForm = (event) => {
   const {
     base_price: basePrice,
     date_from: dateFrom,
     date_to: dateTo,
     destination: {
+      name,
       description,
       pictures,
     },
     offers,
     type,
-  } = point;
+  } = event;
 
-  const offersElements = renderOffers(offers);
+  const offersElements = generateOffers(offers);
   const destinationPhotos = generateDestinationPhotos(pictures);
 
   return (
@@ -120,20 +121,20 @@ const editForm = (point) => {
           <label class="event__label  event__type-output" for="event-destination-1">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="Chamonix" list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${name}" list="destination-list-1">
           <datalist id="destination-list-1">
             <option value="Amsterdam"></option>
             <option value="Geneva"></option>
-            <option value="Chamonix"></option>
+            <option value="${name}"></option>
           </datalist>
         </div>
 
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizeTaskDate(dateFrom, 'DD/MM/YY')} ${humanizeTaskDate(dateFrom, 'HH:MM')}">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizeEventDate(dateFrom, 'DD/MM/YY')} ${humanizeEventDate(dateFrom, 'HH:MM')}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizeTaskDate(dateTo, 'DD/MM/YY')} ${humanizeTaskDate(dateTo, 'HH:MM')}">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizeEventDate(dateTo, 'DD/MM/YY')} ${humanizeEventDate(dateTo, 'HH:MM')}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -170,4 +171,26 @@ const editForm = (point) => {
   );
 };
 
-export { editForm };
+export default class editForm {
+  constructor (event) {
+    this._event = event;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return generateForm(this._event);
+  }
+
+  getElement() {
+    if(!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+

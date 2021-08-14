@@ -1,7 +1,7 @@
-import { sortByDate, humanizeTaskDate } from '../utils.js';
+import { sortByDate, humanizeEventDate, createElement } from '../utils.js';
 
-const findPoints = (points) => {
-  const sortedPointsByDates = sortByDate(points);
+const findEvents = (events) => {
+  const sortedPointsByDates = sortByDate(events);
 
   return {
     startPoint: sortedPointsByDates[0].destination.name,
@@ -12,12 +12,12 @@ const findPoints = (points) => {
   };
 };
 
-const tripInfo = (points) => {
+const generatetripInfo = (events) => {
 
-  const { startPoint, endPoint, throughPoint, startDate, endDate }  = findPoints(points);
+  const { startPoint, endPoint, throughPoint, startDate, endDate }  = findEvents(events);
 
-  const costValueDefinition = points
-    .map((point) => point.base_price)
+  const costValueDefinition = events
+    .map((event) => event.base_price)
     .reduce((sum, price) => sum + price);
 
   return (
@@ -25,7 +25,7 @@ const tripInfo = (points) => {
     <div class="trip-info__main">
       <h1 class="trip-info__title">${startPoint} &mdash; ${throughPoint} &mdash; ${endPoint}</h1>
 
-      <p class="trip-info__dates">${humanizeTaskDate(startDate, 'MMM DD')}&nbsp;&mdash;&nbsp;${humanizeTaskDate(endDate, 'MMM DD')}.</p>
+      <p class="trip-info__dates">${humanizeEventDate(startDate, 'MMM DD')}&nbsp;&mdash;&nbsp;${humanizeEventDate(endDate, 'MMM DD')}.</p>
     </div>
 
     <p class="trip-info__cost">
@@ -35,4 +35,26 @@ const tripInfo = (points) => {
   );
 };
 
-export { tripInfo };
+
+export default class TripInfo {
+  constructor (events) {
+    this._events = events;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return generatetripInfo(this._events);
+  }
+
+  getElement() {
+    if(!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

@@ -10,7 +10,7 @@ const generateDistanation = () => (
   }
 );
 
-const generatePoint = () => {
+const generateEvent = () => {
   const newDate = generateFromToDate();
 
   return {
@@ -25,4 +25,4 @@ const generatePoint = () => {
   };
 };
 
-export { generatePoint };
+export { generateEvent };
