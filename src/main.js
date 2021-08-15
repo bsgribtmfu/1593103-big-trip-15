@@ -9,13 +9,14 @@ import EventsList from './view/events-list.js';
 import Sort from './view/sort.js';
 import EventItem from './view/event-item.js';
 import EditForm from './view/edit-form.js';
+import EmptyList from './view/empty-list.js';
 
 const tripMain = document.querySelector('.trip-main');
 const tripNavigation = document.querySelector('.trip-controls__navigation');
 const tripControlsFilters = document.querySelector('.trip-controls__filters');
 const tripEvents = document.querySelector('.trip-events');
 
-const EVENT_COUNT = 20;
+const EVENT_COUNT = 0;
 
 const generateEvents = (count) => {
   const eventElements = [];
@@ -69,19 +70,23 @@ const renderEvent = (eventItem, point) => {
 };
 
 const renderEventsList = (container, eventsObject) => {
-  const eventList = new EventsList();
+  if(eventsObject.length === 0) {
+    render(container, new EmptyList().getElement(), RenderPosition.BEFOREEND);
+  } else {
+    const eventList = new EventsList();
 
-  render(container, eventList.getElement(), RenderPosition.BEFOREEND);
+    render(container, eventList.getElement(), RenderPosition.BEFOREEND);
+    render(tripMain, new TripInfo(events).getElement(), RenderPosition.AFTERBEGIN);
 
-  eventsObject.map((event) => {
-    const eventItem = new EventItem();
+    eventsObject.map((event) => {
+      const eventItem = new EventItem();
 
-    render(eventList.getElement(), eventItem.getElement(), RenderPosition.BEFOREEND); // ренедерим <li>
-    renderEvent(eventItem.getElement(), event); // ренедерим points и навешиваем события на кнопку каждой точки.
-  });
+      render(eventList.getElement(), eventItem.getElement(), RenderPosition.BEFOREEND); // ренедерим <li>
+      renderEvent(eventItem.getElement(), event); // ренедерим points и навешиваем события на кнопку каждой точки.
+    });
+  }
 };
 
-render(tripMain, new TripInfo(events).getElement(), RenderPosition.AFTERBEGIN);
 render(tripNavigation, new Navigation().getElement(), RenderPosition.BEFOREEND);
 render(tripControlsFilters, new FilterTemplate().getElement(), RenderPosition.BEFOREEND);
 render(tripEvents, new Sort().getElement(), RenderPosition.BEFOREEND);
