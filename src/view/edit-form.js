@@ -228,4 +228,3 @@ export default class editForm extends Abstract {
     this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formRemoveHandler);
   }
 }
-

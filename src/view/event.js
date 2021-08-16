@@ -83,4 +83,3 @@ export default class Event extends Abstract {
     this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._editClickHandler);
   }
 }
-

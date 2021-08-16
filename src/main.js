@@ -83,16 +83,8 @@ const renderEventsList = (container, eventsObject) => {
   }
 };
 
-const renderFilter = () => {
-  const filter = new Filter();
-  render(tripControlsFilters, filter, RenderPosition.BEFOREEND);
-};
-
-renderFilter();
-
 render(tripNavigation, new Navigation(), RenderPosition.BEFOREEND);
+render(tripControlsFilters, new Filter(), RenderPosition.BEFOREEND);
 render(tripEvents, new Sort(), RenderPosition.BEFOREEND);
 
 renderEventsList(tripEvents, events);
-
-
