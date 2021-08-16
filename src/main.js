@@ -36,13 +36,6 @@ const renderEvent = (eventItem, event) => {
 
   render(eventItem, eventComponent, RenderPosition.BEFOREEND);
 
-  eventComponent.setEditClickHandler(() => { // toggle to edit-form | main_button
-    replaceElement(eventItem, editFormComponent, eventComponent);
-    document.addEventListener('keydown', onEscKeyDown);
-  });
-
-  editFormComponent.removeElement(() => eventItem.remove());
-
   const onEscKeyDown = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
@@ -50,6 +43,13 @@ const renderEvent = (eventItem, event) => {
       document.removeEventListener('keydown', onEscKeyDown);
     }
   };
+
+  eventComponent.setEditClickHandler(() => { // toggle to edit-form | main_button
+    replaceElement(eventItem, editFormComponent, eventComponent);
+    document.addEventListener('keydown', onEscKeyDown);
+  });
+
+  editFormComponent.removeElement(() => eventItem.remove());
 
   editFormComponent.setEditSubmitHandler(() => { // submit to event | submit
     replaceElement(eventItem, eventComponent, editFormComponent); // to event
