@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 
-import { getRandomIntInclusive, genRandomItemFrom } from '../utils.js';
+import { getRandomIntInclusive, genRandomItemFrom } from '../utils/common.js';
 
 const generateOffers = (titles, price) => {
 

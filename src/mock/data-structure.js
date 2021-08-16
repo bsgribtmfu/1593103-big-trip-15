@@ -1,6 +1,6 @@
 import { CITIES, TYPES, BASE_PRICES, TITLES, PRICES, IMAGES_DESCRIPTION, DESCRIPTION } from './constans.js';
 import { generateTitle, generateOffers, generatePictures, generateFromToDate } from './generate-task.js';
-import { getRandomIntInclusive, genRandomItemFrom } from '../utils.js';
+import { getRandomIntInclusive, genRandomItemFrom } from '../utils/common.js';
 
 const generateDistanation = () => (
   {

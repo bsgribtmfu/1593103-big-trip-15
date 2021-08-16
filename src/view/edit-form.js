@@ -1,4 +1,6 @@
-import { getLastWord, humanizeEventDate, createElement } from '../utils.js';
+import { humanizeEventDate } from '../utils/date.js';
+import { getLastWord } from '../utils/common.js';
+import Abstract from './abstract.js';
 
 const generateDestinationPhotos = (pictures) => {
 
@@ -171,26 +173,59 @@ const generateForm = (event) => {
   );
 };
 
-export default class editForm {
+export default class editForm extends Abstract {
   constructor (event) {
+    super();
     this._event = event;
-    this._element = null;
+    this._editClickHandler = this._editClickHandler.bind(this);
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
+    this._formSaveHandler = this._formSaveHandler.bind(this);
+    this._formRemoveHandler = this._formRemoveHandler.bind(this);
   }
 
   getTemplate() {
     return generateForm(this._event);
   }
 
-  getElement() {
-    if(!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _editClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.editClick();
   }
 
-  removeElement() {
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callback.formSubmit();
+  }
+
+  _formSaveHandler(evt) {
+    evt.preventDefault();
+    this._callback.saveSubmit();
+  }
+
+  _formRemoveHandler(evt) {
+    evt.preventDefault();
+    this._callback.deliteSubmit();
     this._element = null;
+  }
+
+  setEditClickHandler(callback) {
+    this._callback.editClick = callback;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._editClickHandler);
+  }
+
+  setEditSubmitHandler(callback) {
+    this._callback.editSubmit = callback;
+    this.getElement().addEventListener('submit', this._formSubmitHandler);
+  }
+
+  setEditSaveClickHandler(callback) {
+    this._callback.saveSubmit = callback;
+    this.getElement().querySelector('.event__save-btn').addEventListener('click', this._formSaveHandler);
+  }
+
+  removeElement(callback) {
+    this._callback.deliteSubmit = callback;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formRemoveHandler);
   }
 }
 
