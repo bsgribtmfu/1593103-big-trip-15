@@ -1,14 +1,16 @@
 import { createElement } from '../utils/render.js';
 
-const generateEmptyMessage = () => '<p class="trip-events__msg">Click New Event to create your first point</p>';
-
-export default class EmptyList {
+export default class Abstract {
   constructor () {
+    if(new.target === Abstract) {
+      throw new Error('Not Abstract class');
+    }
     this._element = null;
+    this._callback = {};
   }
 
   getTemplate() {
-    return generateEmptyMessage();
+    throw new Error('Abstract method not implemented: getTemplate');
   }
 
   getElement() {

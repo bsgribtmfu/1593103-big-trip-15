@@ -1,4 +1,5 @@
-import { sortByDate, humanizeEventDate, createElement } from '../utils.js';
+import { sortByDate, humanizeEventDate } from '../utils/date.js';
+import Abstract from './abstract.js';
 
 const findEvents = (events) => {
   const sortedPointsByDates = sortByDate(events);
@@ -35,26 +36,13 @@ const generatetripInfo = (events) => {
   );
 };
 
-
-export default class TripInfo {
+export default class TripInfo extends Abstract {
   constructor (events) {
+    super();
     this._events = events;
-    this._element = null;
   }
 
   getTemplate() {
     return generatetripInfo(this._events);
-  }
-
-  getElement() {
-    if(!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
