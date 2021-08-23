@@ -199,7 +199,7 @@ export default class editForm extends Abstract {
 
   _formSaveHandler(evt) {
     evt.preventDefault();
-    this._callback.saveSubmit();
+    this._callback.saveSubmit(this._event);
   }
 
   _formRemoveHandler(evt) {
@@ -223,7 +223,7 @@ export default class editForm extends Abstract {
     this.getElement().querySelector('.event__save-btn').addEventListener('click', this._formSaveHandler);
   }
 
-  removeElement(callback) {
+  setEditDeliteClickHandler(callback) {
     this._callback.deliteSubmit = callback;
     this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formRemoveHandler);
   }
