@@ -93,12 +93,12 @@ export default class EventPresenter {
     this._mode = Mode.DEFAULT;
   }
 
-  _handleEditFormSave(event) {
+  _handleEditFormSave(event) {  // eslint-disable-line
     // this._changeData(event); // так я и не понял где "собака зарыта" ...
     this._replaceFormToCard();
   }
 
   _handleFavoriteClick() {
-    this._changeData(Object.assign({}, this._event, {is_favorite: !this._event.is_favorite}));
+    this._changeData(Object.assign({}, this._event, {is_favorite: !this._event.is_favorite})); // eslint-disable-line
   }
 }
