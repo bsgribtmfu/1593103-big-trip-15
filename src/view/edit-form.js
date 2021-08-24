@@ -179,7 +179,6 @@ export default class editForm extends Abstract {
     this._event = event;
     this._editClickHandler = this._editClickHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
-    this._formSaveHandler = this._formSaveHandler.bind(this);
     this._formRemoveHandler = this._formRemoveHandler.bind(this);
   }
 
@@ -194,12 +193,7 @@ export default class editForm extends Abstract {
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit();
-  }
-
-  _formSaveHandler(evt) {
-    evt.preventDefault();
-    this._callback.saveSubmit(this._event);
+    this._callback.formSubmit(this._event);
   }
 
   _formRemoveHandler(evt) {
@@ -214,13 +208,8 @@ export default class editForm extends Abstract {
   }
 
   setEditSubmitHandler(callback) {
-    this._callback.editSubmit = callback;
+    this._callback.formSubmit = callback;
     this.getElement().addEventListener('submit', this._formSubmitHandler);
-  }
-
-  setEditSaveClickHandler(callback) {
-    this._callback.saveSubmit = callback;
-    this.getElement().querySelector('.event__save-btn').addEventListener('click', this._formSaveHandler);
   }
 
   setEditDeliteClickHandler(callback) {

@@ -9,8 +9,8 @@ const Mode = {
 };
 
 export default class EventPresenter {
-  constructor(eventsListConteiner, changeData, changeMode) {
-    this._eventsListConteiner = eventsListConteiner;
+  constructor(eventsListContainer, changeData, changeMode) {
+    this._eventsListContainer = eventsListContainer;
     this._changeData = changeData;
     this._changeMode = changeMode;
 
@@ -22,7 +22,7 @@ export default class EventPresenter {
     this._replaceCardToForm = this._replaceCardToForm.bind(this);
     this._replaceFormToCard = this._replaceFormToCard.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
-    this._handleEditFormSave = this._handleEditFormSave.bind(this);
+    this._handleEditSubmit = this._handleEditSubmit.bind(this);
     this._removeEditForm = this._removeEditForm.bind(this);
   }
 
@@ -37,12 +37,12 @@ export default class EventPresenter {
 
     this._eventComponent.setEditClickHandler(this._replaceCardToForm);        // event -> form
     this._editFormComponent.setEditClickHandler(this._replaceFormToCard);     // form -> event  | main
-    this._editFormComponent.setEditSaveClickHandler(this._handleEditFormSave); // form -> event  | save
+    this._editFormComponent.setEditSubmitHandler(this._handleEditSubmit);   // form -> event  | submit
     this._editFormComponent.setEditDeliteClickHandler(this._removeEditForm);  // form -> event  | delite
-    this._eventComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+    this._eventComponent.setFavoriteClickHandler(this._handleFavoriteClick);  // event favorite button click
 
     if (prevEventComponent === null || prevEditFormComponent === null) {
-      render(this._eventsListConteiner, this._eventComponent, RenderPosition.BEFOREEND);
+      render(this._eventsListContainer, this._eventComponent, RenderPosition.BEFOREEND);
       return;
     }
 
@@ -93,8 +93,8 @@ export default class EventPresenter {
     this._mode = Mode.DEFAULT;
   }
 
-  _handleEditFormSave(event) {  // eslint-disable-line
-    // this._changeData(event); // так я и не понял где "собака зарыта" ...
+  _handleEditSubmit() {  // eslint-disable-line
+    // this._changeData(this._event); // так я и не понял где "собака зарыта" ...
     this._replaceFormToCard();
   }
 
