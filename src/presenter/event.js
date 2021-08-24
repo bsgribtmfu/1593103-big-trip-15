@@ -1,4 +1,4 @@
-import { render, RenderPosition, replaceElement, remove } from '../utils/render.js';
+import { render, RenderPosition, replaceElement, removeElement } from '../utils/render.js';
 
 import Event from '../view/event.js';
 import EditForm from '../view/edit-form.js';
@@ -54,8 +54,8 @@ export default class EventPresenter {
       replaceElement(this._editFormComponent, prevEditFormComponent);
     }
 
-    remove(prevEventComponent);     // this._element = null AND remove element from DOM
-    remove(prevEditFormComponent);  // this._element = null AND remove element from DOM
+    removeElement(prevEventComponent);     // this._element = null AND remove element from DOM
+    removeElement(prevEditFormComponent);
   }
 
   resetView() {
@@ -65,12 +65,12 @@ export default class EventPresenter {
   }
 
   destroy() {
-    remove(this._eventComponent);
-    remove(this._editFormComponent);
+    removeElement(this._eventComponent);  // this._element = null AND remove element from DOM
+    removeElement(this._editFormComponent);
   }
 
   _removeEditForm() {
-    remove(this._editFormComponent); // this._element = null AND remove element from DOM
+    removeElement(this._editFormComponent); // this._element = null AND remove element from DOM
   }
 
   _escKeyDownHandler(evt) {
@@ -80,14 +80,14 @@ export default class EventPresenter {
     }
   }
 
-  _replaceCardToForm() { // call-back функция to edit form
+  _replaceCardToForm() { // call-back function to edit form
     replaceElement(this._editFormComponent, this._eventComponent);
-    document.addEventListener('keydown', this._escKeyDownHandler); // вешаем ф-ю обработчик нажатия клавиши esc
+    document.addEventListener('keydown', this._escKeyDownHandler);
     this._changeMode();
     this._mode = Mode.EDITING;
   }
 
-  _replaceFormToCard() { // call-back функция to event
+  _replaceFormToCard() { // call-back function to event
     replaceElement(this._eventComponent, this._editFormComponent);
     document.removeEventListener('keydown', this._escKeyDownHandler);
     this._mode = Mode.DEFAULT;
