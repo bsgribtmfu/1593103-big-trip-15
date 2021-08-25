@@ -25,16 +25,25 @@ const render = (container, element, place) => {
   }
 };
 
-const replaceElement = (parentNode, newChild, oldChild) => {
-  if (newChild instanceof Abstract) {
-    newChild = newChild.getElement();
-  }
+const replaceElement = (newChild, oldChild) => {
+  let oldChildElem;
+  let newChildElem;
 
   if (oldChild instanceof Abstract) {
-    oldChild = oldChild.getElement();
+    oldChildElem = oldChild.getElement();
   }
 
-  parentNode.replaceChild(newChild, oldChild);
+  if (newChild instanceof Abstract) {
+    newChildElem = newChild.getElement();
+  }
+
+  const parent = oldChildElem.parentElement;
+
+  if (parent === null || oldChildElem === null || newChildElem === null) {
+    throw new Error('Can\'t replace unexisting elements');
+  }
+
+  parent.replaceChild(newChildElem, oldChildElem);
 };
 
 const createElement = (template) => {
@@ -44,4 +53,9 @@ const createElement = (template) => {
   return newElement.firstChild;
 };
 
-export { RenderPosition, render, createElement, replaceElement };
+const removeElement = (component) => {
+  component.getElement().remove();
+  component.removeElement();
+};
+
+export { RenderPosition, render, createElement, replaceElement, removeElement };

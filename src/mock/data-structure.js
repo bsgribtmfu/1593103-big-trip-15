@@ -1,3 +1,5 @@
+import { nanoid } from 'nanoid';
+
 import { CITIES, TYPES, BASE_PRICES, TITLES, PRICES, IMAGES_DESCRIPTION, DESCRIPTION } from './constans.js';
 import { generateTitle, generateOffers, generatePictures, generateFromToDate } from './generate-task.js';
 import { getRandomIntInclusive, genRandomItemFrom } from '../utils/common.js';
@@ -18,7 +20,7 @@ const generateEvent = () => {
     'date_from': newDate.dateFrom,
     'date_to': newDate.dateTo,
     'destination': generateDistanation(),
-    'id': getRandomIntInclusive(0, 20),
+    'id': nanoid(),
     'is_favorite': Boolean(getRandomIntInclusive(0, 1)),
     'offers': generateOffers(TITLES, PRICES),
     'type': genRandomItemFrom(TYPES),
