@@ -3,7 +3,7 @@ import duration from 'dayjs/plugin/duration';
 
 dayjs.extend(duration);
 
-const sortByDate = (points) => points.sort((a, b) => dayjs(a.date_from) - dayjs(b.date_from));
+const sortByDate = (events) => events.sort((a, b) => dayjs(a.date_from) - dayjs(b.date_from));
 
 const differenceDate = (dateFrom, dateTo) => {
   const from = dayjs(dateFrom);
@@ -13,6 +13,10 @@ const differenceDate = (dateFrom, dateTo) => {
 };
 
 const humanizeEventDate = (date, format) => dayjs(date).format(format);
+
+// const getDiffDuration = (a, b) => {
+//
+// }
 
 export {
   sortByDate,

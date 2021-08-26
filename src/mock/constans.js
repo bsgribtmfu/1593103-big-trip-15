@@ -43,4 +43,10 @@ const PRICES = [180, 90, 50, 30, 170, 50, 130];
 
 const BASE_PRICES = [282, 1100, 630, 380, 450];
 
-export { CITIES, TYPES, TITLES, IMAGES_DESCRIPTION, PRICES, BASE_PRICES, DESCRIPTION };
+const SortType = {
+  DEFAULT: 'default',
+  TRIP_TIME: 'trip-time',
+  PRICE_UP: 'price-up',
+};
+
+export { CITIES, TYPES, TITLES, IMAGES_DESCRIPTION, PRICES, BASE_PRICES, DESCRIPTION, SortType };
