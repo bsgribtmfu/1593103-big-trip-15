@@ -52,7 +52,8 @@ const generateTitle = (description) => {
 const generateRandomDate = () => {
   const now = dayjs()
     .add(getRandomIntInclusive(1, 30), 'day')
-    .add(getRandomIntInclusive(0, 23), 'hour');
+    .add(getRandomIntInclusive(0, 23), 'hour')
+    .add(getRandomIntInclusive(20, 59), 'minute');
 
   return now.format('YYYY-MM-DDTHH:mm:ss.sss[Z]');
 };

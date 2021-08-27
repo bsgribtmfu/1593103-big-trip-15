@@ -28,4 +28,6 @@ const updateItem = (items, update) => {
   ];
 };
 
-export { getRandomIntInclusive, genRandomItemFrom, getLastWord, updateItem };
+const sortByPrice = (a, b) => b.base_price - a.base_price;
+
+export { getRandomIntInclusive, genRandomItemFrom, getLastWord, updateItem, sortByPrice };

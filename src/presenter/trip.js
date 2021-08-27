@@ -1,5 +1,7 @@
 import { render, RenderPosition } from '../utils/render.js';
-import { updateItem } from '../utils/common.js';
+import { updateItem, sortByPrice } from '../utils/common.js';
+import { getDiffDuration } from '../utils/date.js';
+import { SortType } from '../mock/constans.js';
 
 import EventsList from '../view/events-list.js';
 import EmptyList from '../view/empty-list.js';
@@ -15,6 +17,7 @@ export default class Trip {
     this._tripSummaryContainer = tripSummaryContainer;
     this._navigationContainer = navigationContainer;
     this._filtersContainer = filtersContainer;
+    this._currentSortType = SortType.DEFAULT;
 
     this._eventPresenter = new Map(); // events
 
@@ -26,11 +29,38 @@ export default class Trip {
 
     this._handleEventChange = this._handleEventChange.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
+    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
 
   init(events) {
     this._events = [...events];
+    this._sourcedEvents = [...events];
     this._renderTrip();
+  }
+
+  _sortEvents(sortType) { // сортировка
+    switch (sortType) {
+      case SortType.TRIP_TIME:
+        this._events.sort(getDiffDuration);
+        break;
+      case SortType.PRICE_UP:
+        this._events.sort(sortByPrice);
+        break;
+      default:
+        this._events = [...this._sourcedEvents];
+    }
+
+    this._currentSortType = sortType;
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+
+    this._sortEvents(sortType);
+    this._clearEventList();
+    this._renderEvents();
   }
 
   _handleModeChange() {
@@ -39,12 +69,13 @@ export default class Trip {
 
   _handleEventChange(updatedEvent) {
     this._events = updateItem(this._events, updatedEvent);
+    this._sourcedBoardTasks = updateItem(this._sourcedEvents, updatedEvent);
     this._eventPresenter.get(updatedEvent.id).init(updatedEvent);
   }
 
   _clearEventList() {
-    this.eventPresenter.forEach((presenter) => presenter.destroy());
-    this.eventPresenter.clear();
+    this._eventPresenter.forEach((presenter) => presenter.destroy());
+    this._eventPresenter.clear();
   }
 
   _renderFilters() {
@@ -65,6 +96,7 @@ export default class Trip {
 
   _renderSort() {
     render(this._mainContainer, this._sort, RenderPosition.BEFOREEND);
+    this._sort.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
   _renderTripInfo() {

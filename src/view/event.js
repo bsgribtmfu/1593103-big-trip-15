@@ -1,4 +1,4 @@
-import { humanizeEventDate, differenceDate } from '../utils/date.js';
+import { humanizeEventDate, getDuration } from '../utils/date.js';
 import { genRandomItemFrom} from '../utils/common.js';
 import Abstract from './abstract.js';
 
@@ -15,7 +15,7 @@ const generateEvent = (event) => {
     type,
   } = event;
 
-  const diffDate = differenceDate(dateFrom, dateTo);
+  const diffDuration = getDuration(dateFrom, dateTo);
 
   const offer = genRandomItemFrom(offers);
 
@@ -33,11 +33,11 @@ const generateEvent = (event) => {
         <h3 class="event__title">${type} ${name}</h3>
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime="${humanizeEventDate(dateFrom, 'YYYY-MM-DD')}">${humanizeEventDate(dateFrom, 'HH:MM')}</time>
+            <time class="event__start-time" datetime="${humanizeEventDate(dateFrom, 'YYYY-MM-DD')}">${humanizeEventDate(dateFrom, 'HH:mm')}</time>
             &mdash;
-            <time class="event__end-time" datetime="${humanizeEventDate(dateTo, 'YYYY-MM-DD')}">${humanizeEventDate(dateTo, 'HH:MM')}</time>
+            <time class="event__end-time" datetime="${humanizeEventDate(dateTo, 'YYYY-MM-DD')}">${humanizeEventDate(dateTo, 'HH:mm')}</time>
           </p>
-          <p class="event__duration">${humanizeEventDate(diffDate, 'HH[H] mm[M]')}</p>
+          <p class="event__duration">${humanizeEventDate(diffDuration.format(), 'HH[H] mm[M]')}</p>
         </div>
         <p class="event__price">
           &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
