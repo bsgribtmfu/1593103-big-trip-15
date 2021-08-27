@@ -1,5 +1,5 @@
 import { render, RenderPosition } from '../utils/render.js';
-import { updateItem, sortNumbers } from '../utils/common.js';
+import { updateItem, sortByPrice } from '../utils/common.js';
 import { getDiffDuration } from '../utils/date.js';
 import { SortType } from '../mock/constans.js';
 
@@ -44,7 +44,7 @@ export default class Trip {
         this._events.sort(getDiffDuration);
         break;
       case SortType.PRICE_UP:
-        this._events.sort(sortNumbers);
+        this._events.sort(sortByPrice);
         break;
       default:
         this._events = [...this._sourcedEvents];

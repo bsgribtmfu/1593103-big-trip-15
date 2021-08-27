@@ -15,7 +15,7 @@ const generateEvent = (event) => {
     type,
   } = event;
 
-  const diffDate = getDuration(dateFrom, dateTo);
+  const diffDuration = getDuration(dateFrom, dateTo);
 
   const offer = genRandomItemFrom(offers);
 
@@ -37,7 +37,7 @@ const generateEvent = (event) => {
             &mdash;
             <time class="event__end-time" datetime="${humanizeEventDate(dateTo, 'YYYY-MM-DD')}">${humanizeEventDate(dateTo, 'HH:mm')}</time>
           </p>
-          <p class="event__duration">${humanizeEventDate(diffDate.format(), 'HH[H] mm[M]')}</p>
+          <p class="event__duration">${humanizeEventDate(diffDuration.format(), 'HH[H] mm[M]')}</p>
         </div>
         <p class="event__price">
           &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
