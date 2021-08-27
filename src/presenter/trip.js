@@ -1,5 +1,6 @@
 import { render, RenderPosition } from '../utils/render.js';
 import { updateItem, sortNumbers } from '../utils/common.js';
+import { getDiffDuration } from '../utils/date.js';
 import { SortType } from '../mock/constans.js';
 
 import EventsList from '../view/events-list.js';
@@ -37,10 +38,10 @@ export default class Trip {
     this._renderTrip();
   }
 
-  _sortTasks(sortType) {
+  _sortEvents(sortType) { // сортировка
     switch (sortType) {
       case SortType.TRIP_TIME:
-        // this._events.sort(sortNumbers);
+        this._events.sort(getDiffDuration);
         break;
       case SortType.PRICE_UP:
         this._events.sort(sortNumbers);
@@ -57,7 +58,7 @@ export default class Trip {
       return;
     }
 
-    this._sortTasks(sortType);
+    this._sortEvents(sortType);
     this._clearEventList();
     this._renderEvents();
   }

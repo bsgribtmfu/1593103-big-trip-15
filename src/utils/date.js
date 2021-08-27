@@ -5,21 +5,17 @@ dayjs.extend(duration);
 
 const sortByDate = (events) => events.sort((a, b) => dayjs(a.date_from) - dayjs(b.date_from));
 
-const differenceDate = (dateFrom, dateTo) => {
-  const from = dayjs(dateFrom);
-  const to = dayjs(dateTo);
+const getDiff = (from, to) => dayjs(to).diff(dayjs(from));
 
-  return dayjs.duration(to.diff(from)).format();
-};
+const getDuration = (from, to) => dayjs.duration(getDiff(from, to));
 
 const humanizeEventDate = (date, format) => dayjs(date).format(format);
 
-// const getDiffDuration = (a, b) => {
-//
-// }
+const getDiffDuration = (a, b) => getDiff(a.date_from, a.date_to) - getDiff(b.date_from, b.date_to);
 
 export {
   sortByDate,
-  differenceDate,
-  humanizeEventDate
+  getDuration,
+  humanizeEventDate,
+  getDiffDuration
 };
