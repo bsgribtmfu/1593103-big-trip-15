@@ -37,7 +37,7 @@ export default class EventPresenter {
 
     this._eventComponent.setEditClickHandler(this._replaceCardToForm);        // event -> form
     this._editFormComponent.setEditClickHandler(this._replaceFormToCard);     // form -> event  | main
-    this._editFormComponent.setEditSubmitHandler(this._handleEditSubmit);   // form -> event  | submit
+    this._editFormComponent.setEditSubmitHandler(this._handleEditSubmit);     // save | submit
     this._editFormComponent.setEditDeliteClickHandler(this._removeEditForm);  // form -> event  | delite
     this._eventComponent.setFavoriteClickHandler(this._handleFavoriteClick);  // event favorite button click
 
@@ -93,12 +93,12 @@ export default class EventPresenter {
     this._mode = Mode.DEFAULT;
   }
 
-  _handleEditSubmit() {  // eslint-disable-line
-    // this._changeData(this._event); // так я и не понял где "собака зарыта" ...
+  _handleEditSubmit(event) {  // eslint-disable-line
+    this._changeData(event);  // если мы закоментируем эту строку, то ошибки нет, я, к слову, вчера еще часа три дебажил код, но безуспешно.
     this._replaceFormToCard();
   }
 
   _handleFavoriteClick() {
-    this._changeData(Object.assign({}, this._event, {is_favorite: !this._event.is_favorite})); // eslint-disable-line
+    this._changeData(Object.assign({}, this._event, { is_favorite: !this._event.is_favorite })); // eslint-disable-line
   }
 }

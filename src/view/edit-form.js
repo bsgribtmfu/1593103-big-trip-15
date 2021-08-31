@@ -1,5 +1,6 @@
 import { humanizeEventDate } from '../utils/date.js';
 import { getLastWord } from '../utils/common.js';
+import { CITIES as destinations } from '../mock/constans.js';
 import Abstract from './abstract.js';
 
 const generateDestinationPhotos = (pictures) => {
@@ -35,7 +36,9 @@ const generateOffers = (offers) => {
   return offersElements;
 };
 
-const generateForm = (event) => {
+const generateDistanations = () => destinations.map((destination) => `<option value="${destination}"></option>`).join('');
+
+const generateForm = (data) => {
   const {
     base_price: basePrice,
     date_from: dateFrom,
@@ -47,13 +50,15 @@ const generateForm = (event) => {
     },
     offers,
     type,
-  } = event;
+  } = data;
 
   const offersElements = generateOffers(offers);
   const destinationPhotos = generateDestinationPhotos(pictures);
+  const destinationOptions = generateDistanations();
 
   return (
-    `<form class="event event--edit" action="#" method="post">
+    `<li class="trip-events__item">
+    <form class="event event--edit" action="#" method="post">
       <header class="event__header">
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -125,9 +130,7 @@ const generateForm = (event) => {
           </label>
           <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${name}" list="destination-list-1">
           <datalist id="destination-list-1">
-            <option value="Amsterdam"></option>
-            <option value="Geneva"></option>
-            <option value="${name}"></option>
+            ${destinationOptions}
           </datalist>
         </div>
 
@@ -169,21 +172,93 @@ const generateForm = (event) => {
           ${destinationPhotos}
         </section>
       </section>
-    </form>`
+    </form>
+    </li>`
   );
 };
 
-export default class editForm extends Abstract {
+export default class editForm extends Abstract { // название классов с заглавной буквы?
   constructor (event) {
     super();
-    this._event = event;
+    this._data = editForm.parseEventToData(event); // состояние
+    this._eventTypeSelectHandler = this._eventTypeSelectHandler.bind(this);
+    this._eventDestinationInputHandler = this._eventDestinationInputHandler.bind(this);
+    this._eventPriceChangeHandler = this._eventPriceChangeHandler.bind(this);
+    this._eventPriceInputHandler = this._eventPriceInputHandler.bind(this);
     this._editClickHandler = this._editClickHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._formRemoveHandler = this._formRemoveHandler.bind(this);
+
+    this._setInnerHandlers();
   }
 
   getTemplate() {
-    return generateForm(this._event);
+    return generateForm(this._data);
+  }
+
+  updateData(update, justDataUpdating) {
+    if (!update) {
+      return;
+    }
+
+    this._data = Object.assign(
+      {},
+      this._data,
+      update,
+    );
+
+    if (justDataUpdating) {
+      return;
+    }
+
+    this.updateElement();
+  }
+
+  updateElement() {
+    const prevElement = this.getElement();
+    const parent = prevElement.parentElement;
+    this.removeElement();
+
+    const newElement = this.getElement();
+
+    parent.replaceChild(newElement, prevElement);
+
+    this.restoreHandlers();
+  }
+
+  restoreHandlers() { // restore handlers
+    this._setInnerHandlers();
+    this.setEditDeliteClickHandler(this._callback.deliteSubmit);
+    this.setEditSubmitHandler(this._callback.formSubmit);
+    this.setEditClickHandler(this._callback.editClick);
+  }
+
+  _eventTypeSelectHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      type: evt.target.parentElement.querySelector('input').value,
+    });
+  }
+
+  _eventDestinationInputHandler(evt) { // change input destination
+    console.log(evt.target); // не понял что мне тут надо сделать, можешь подробнее и пошагово описать?
+  }
+
+  _eventPriceChangeHandler(evt) { // change input price
+    const price = Number(evt.target.value);
+
+    if (price <= 0) {
+      evt.target.value = '1'; // что тут вернуть, текущее значение?
+    }
+
+    this.updateData({
+      'base_price': evt.target.value,
+    }, true);
+  }
+
+  _eventPriceInputHandler(evt) {
+    console.log(typeof evt.target.value)
+    return evt.target.value.replace(/[^0-9]/, ''); // почему эта казлина не реплейсит, я уже все маски перепробывал
   }
 
   _editClickHandler(evt) {
@@ -193,7 +268,7 @@ export default class editForm extends Abstract {
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit(this._event);
+    this._callback.formSubmit(editForm.parseDataToEvent(this._data));
   }
 
   _formRemoveHandler(evt) {
@@ -202,18 +277,38 @@ export default class editForm extends Abstract {
     this._element = null;
   }
 
-  setEditClickHandler(callback) {
+  _setInnerHandlers() { // обработчики событий View
+    this.getElement().querySelector('.event__type-list').addEventListener('click', this._eventTypeSelectHandler);
+    this.getElement().querySelector('.event__input--destination').addEventListener('input', this._eventDestinationInputHandler);
+    this.getElement().querySelector('.event__input--price').addEventListener('change', this._eventPriceChangeHandler);
+    this.getElement().querySelector('.event__input--price').addEventListener('input', this._eventPriceInputHandler);
+  }
+
+  setEditClickHandler(callback) { // button 'rollup'
     this._callback.editClick = callback;
     this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._editClickHandler);
   }
 
-  setEditSubmitHandler(callback) {
+  setEditSubmitHandler(callback) { // button 'Save'
     this._callback.formSubmit = callback;
-    this.getElement().addEventListener('submit', this._formSubmitHandler);
+    this.getElement().querySelector('form').addEventListener('submit', this._formSubmitHandler);
   }
 
-  setEditDeliteClickHandler(callback) {
+  setEditDeliteClickHandler(callback) { // button 'Delete'
     this._callback.deliteSubmit = callback;
     this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formRemoveHandler);
+  }
+
+  static parseEventToData(event) {
+    return Object.assign(
+      {},
+      event,
+    );
+  }
+
+  static parseDataToEvent(data) {
+    data = Object.assign({}, data);
+
+    return data;
   }
 }

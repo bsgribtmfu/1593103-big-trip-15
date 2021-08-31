@@ -39,6 +39,14 @@ const replaceElement = (newChild, oldChild) => {
 
   const parent = oldChildElem.parentElement;
 
+  console.log(
+    {
+      'oldChildElem': oldChildElem,
+      'newChildElem': newChildElem,
+      'parent': parent,
+    }
+  );
+
   if (parent === null || oldChildElem === null || newChildElem === null) {
     throw new Error('Can\'t replace unexisting elements');
   }
