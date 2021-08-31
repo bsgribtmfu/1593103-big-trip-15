@@ -240,7 +240,7 @@ export default class editForm extends Abstract { // название класс�
     });
   }
 
-  _eventDestinationInputHandler(evt) { // change input destination
+  _eventDestinationInputHandler() { // change input destination
     // не понял что мне тут надо сделать, можешь подробнее и пошагово описать? // eslint-disable-line
   }
 
