@@ -241,7 +241,7 @@ export default class editForm extends Abstract { // название класс�
   }
 
   _eventDestinationInputHandler(evt) { // change input destination
-    console.log(evt.target); // не понял что мне тут надо сделать, можешь подробнее и пошагово описать?
+    console.log(evt.target); // не понял что мне тут надо сделать, можешь подробнее и пошагово описать? // eslint-disable-line
   }
 
   _eventPriceChangeHandler(evt) { // change input price
@@ -257,7 +257,7 @@ export default class editForm extends Abstract { // название класс�
   }
 
   _eventPriceInputHandler(evt) {
-    console.log(typeof evt.target.value)
+    console.log(typeof evt.target.value); // eslint-disable-line
     return evt.target.value.replace(/[^0-9]/, ''); // почему эта казлина не реплейсит, я уже все маски перепробывал
   }
 
