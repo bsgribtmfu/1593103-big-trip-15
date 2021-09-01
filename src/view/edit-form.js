@@ -19,7 +19,6 @@ const generateDestinationPhotos = (pictures) => {
 };
 
 const generateOffers = (offers) => {
-
   const offersElements = offers.map((offerItem) => {
     const word = getLastWord(offerItem.title);
 
@@ -35,7 +34,26 @@ const generateOffers = (offers) => {
     );
   });
 
-  return offersElements;
+  return offersElements.join('');
+};
+
+const generateOffersTemplate = (offers) => {
+
+  const offersElements = generateOffers(offers);
+
+  if(!offers.length) {
+    return '';
+  }
+
+  return (
+    `<section class="event__section  event__section--offers">
+      <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+
+      <div class="event__available-offers">
+        ${offersElements}
+      </div>
+    </section>`
+  );
 };
 
 const generateDistanations = () => destinations.map((destination) => `<option value="${destination}"></option>`).join('');
@@ -54,7 +72,6 @@ const generateForm = (data) => {
     type,
   } = data;
 
-  const offersElements = generateOffers(offers);
   const destinationPhotos = generateDestinationPhotos(pictures);
   const destinationOptions = generateDistanations();
 
@@ -159,14 +176,7 @@ const generateForm = (data) => {
         </button>
       </header>
       <section class="event__details">
-        <section class="event__section  event__section--offers">
-          <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-
-          <div class="event__available-offers">
-            ${offersElements.join('')}
-          </div>
-        </section>
-
+        ${generateOffersTemplate(offers)}
         <section class="event__section  event__section--destination">
           <h3 class="event__section-title  event__section-title--destination">Destination</h3>
           <p class="event__destination-description">${description}</p>
@@ -245,8 +255,18 @@ export default class editForm extends Abstract { // название класс�
     });
   }
 
-  _eventDestinationInputHandler() { // пункт назначения
-    // показать новые описание и фотографии.
+  _eventDestinationInputHandler(evt) { // пункт назначения
+    if(!evt.target.value.length) {
+      evt.target.placeholder = 'Enter or select city name';
+    }
+  }
+
+  _eventDestinationChangeHandler() {
+    // this.updateData({
+    //   'description': generateTitle(DESCRIPTION),
+    //   'name': genRandomItemFrom(CITIES),
+    //   'pictures': generatePictures(IMAGES_DESCRIPTION),
+    // }, true);
   }
 
   _eventPriceChangeHandler(evt) { // change input price
@@ -285,6 +305,7 @@ export default class editForm extends Abstract { // название класс�
   _setInnerHandlers() { // обработчики событий View
     this.getElement().querySelector('.event__type-list').addEventListener('click', this._eventTypeSelectHandler);
     this.getElement().querySelector('.event__input--destination').addEventListener('input', this._eventDestinationInputHandler);
+    this.getElement().querySelector('.event__input--destination').addEventListener('input', this._eventDestinationChangeHandler);
     this.getElement().querySelector('.event__input--price').addEventListener('change', this._eventPriceChangeHandler);
     this.getElement().querySelector('.event__input--price').addEventListener('input', this._eventPriceInputHandler);
   }

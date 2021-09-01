@@ -6,11 +6,22 @@ import { getRandomIntInclusive, genRandomItemFrom } from '../utils/common.js';
 
 const generateDistanation = () => (
   {
-    'description': generateTitle(DESCRIPTION),
-    'name': genRandomItemFrom(CITIES),
-    'pictures': generatePictures(IMAGES_DESCRIPTION),
+    description: generateTitle(DESCRIPTION),
+    name: genRandomItemFrom(CITIES),
+    pictures: generatePictures(IMAGES_DESCRIPTION),
   }
 );
+
+// const generateDistanations = () => CITIES.map((city) => Object.assign({}, generateDistanation(), {name: city}));
+
+// const cityValue = 'Amsterdam';
+// const destinations1 = generateDistanations();
+
+// const getDestinationByName = (cityValue, destinations) => {
+//   return destinations.find((city) => cityValue === city.name);
+// }
+
+// console.log(getDestinationByName(cityValue, destinations1));
 
 const generateEvent = () => {
   const newDate = generateFromToDate();
