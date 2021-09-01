@@ -27,4 +27,24 @@ const generateEvent = () => {
   };
 };
 
-export { generateEvent };
+const getOffersStructure = () => {
+  const offers = [];
+
+  TYPES.forEach((type) => {
+    offers.push({
+      'type': type,
+      'offers': generateOffers(TITLES, PRICES),
+    });
+  });
+
+  return offers;
+};
+
+const offersMock = getOffersStructure();
+
+const findOfferByType = (typeValue, offers) => {
+  const foundOffer = offers.find((offer) => typeValue === offer.type);
+  return foundOffer.offers;
+};
+
+export { generateEvent, offersMock, findOfferByType };

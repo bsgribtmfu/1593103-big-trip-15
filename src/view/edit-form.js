@@ -1,6 +1,8 @@
 import { humanizeEventDate } from '../utils/date.js';
 import { getLastWord } from '../utils/common.js';
 import { CITIES as destinations } from '../mock/constans.js';
+import { offersMock, findOfferByType } from '../mock/data-structure.js';
+
 import Abstract from './abstract.js';
 
 const generateDestinationPhotos = (pictures) => {
@@ -233,15 +235,18 @@ export default class editForm extends Abstract { // название класс�
     this.setEditClickHandler(this._callback.editClick);
   }
 
-  _eventTypeSelectHandler(evt) {
+  _eventTypeSelectHandler(evt) { // тип точки маршрута, нужно показать соответствующий типу набор дополнительных опций.
     evt.preventDefault();
+    const value = evt.target.parentElement.querySelector('input').value;
+
     this.updateData({
-      type: evt.target.parentElement.querySelector('input').value,
+      type: value,
+      offers: findOfferByType(value, offersMock),
     });
   }
 
-  _eventDestinationInputHandler() { // change input destination
-    // не понял что мне тут надо сделать, можешь подробнее и пошагово описать? // eslint-disable-line
+  _eventDestinationInputHandler() { // пункт назначения
+    // показать новые описание и фотографии.
   }
 
   _eventPriceChangeHandler(evt) { // change input price
@@ -258,7 +263,7 @@ export default class editForm extends Abstract { // название класс�
 
   _eventPriceInputHandler(evt) {
     console.log(typeof evt.target.value); // eslint-disable-line
-    return evt.target.value.replace(/[^0-9]/, ''); // почему эта казлина не реплейсит, я уже все маски перепробывал
+    return evt.target.value.replace(/[^0-9]/, ''); // почему эта казлина не реплейсит, я уже все регулярки перепробывал
   }
 
   _editClickHandler(evt) {
