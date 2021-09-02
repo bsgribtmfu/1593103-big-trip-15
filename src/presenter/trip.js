@@ -71,11 +71,6 @@ export default class Trip {
 
     this._events = updateItem(this._events, updatedEvent);
     this._sourcedBoardTasks = updateItem(this._sourcedEvents, updatedEvent);
-
-    console.log('--------------------');        // eslint-disable-line
-    console.log(updatedEvent, updatedEvent.id); // eslint-disable-line
-    console.log('--------------------');        // eslint-disable-line
-
     this._eventPresenter.get(updatedEvent.id).init(updatedEvent);
   }
 

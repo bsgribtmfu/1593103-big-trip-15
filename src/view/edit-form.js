@@ -1,9 +1,8 @@
 import { humanizeEventDate } from '../utils/date.js';
 import { getLastWord } from '../utils/common.js';
-import { CITIES as destinations } from '../mock/constans.js';
-import { offersMock, findOfferByType } from '../mock/data-structure.js';
+import { offersMock, findOfferByType, getDestinationByName, destinations} from '../mock/data-structure.js';
 
-import Abstract from './abstract.js';
+import Smart from './smart.js';
 
 const generateDestinationPhotos = (pictures) => {
 
@@ -15,6 +14,20 @@ const generateDestinationPhotos = (pictures) => {
         ${pucturesElements.join('')}
       </div>
     </div>`
+  );
+};
+
+const generateDistanationSection = (distanation) => {
+  if(!distanation.description || !distanation.pictures) {
+    return '';
+  }
+
+  return (
+    `<section class="event__section event__section--destination">
+      <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+      <p class="event__destination-description">${distanation.description}</p>
+      ${generateDestinationPhotos(distanation.pictures)}
+    </section>`
   );
 };
 
@@ -37,9 +50,10 @@ const generateOffers = (offers) => {
   return offersElements.join('');
 };
 
-const generateOffersTemplate = (offers) => {
+const generateOffersSection = (offers) => {
 
   const offersElements = generateOffers(offers);
+
 
   if(!offers.length) {
     return '';
@@ -56,23 +70,18 @@ const generateOffersTemplate = (offers) => {
   );
 };
 
-const generateDistanations = () => destinations.map((destination) => `<option value="${destination}"></option>`).join('');
+const generateDistanations = () => destinations.map((destination) => `<option value="${destination.name}"></option>`).join('');
 
 const generateForm = (data) => {
   const {
     base_price: basePrice,
     date_from: dateFrom,
     date_to: dateTo,
-    destination: {
-      name,
-      description,
-      pictures,
-    },
+    destination,
     offers,
     type,
   } = data;
 
-  const destinationPhotos = generateDestinationPhotos(pictures);
   const destinationOptions = generateDistanations();
 
   return (
@@ -147,7 +156,7 @@ const generateForm = (data) => {
           <label class="event__label  event__type-output" for="event-destination-1">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${name}" list="destination-list-1">
+          <input class="event__input event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
           <datalist id="destination-list-1">
             ${destinationOptions}
           </datalist>
@@ -176,25 +185,21 @@ const generateForm = (data) => {
         </button>
       </header>
       <section class="event__details">
-        ${generateOffersTemplate(offers)}
-        <section class="event__section  event__section--destination">
-          <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-          <p class="event__destination-description">${description}</p>
-
-          ${destinationPhotos}
-        </section>
+        ${generateOffersSection(offers)}
+        ${generateDistanationSection(destination)}
       </section>
     </form>
     </li>`
   );
 };
 
-export default class editForm extends Abstract { // название классов с заглавной буквы?
+export default class EditForm extends Smart { // название классов с заглавной буквы?
   constructor (event) {
     super();
-    this._data = editForm.parseEventToData(event); // состояние
+    this._data = EditForm.parseEventToData(event);
     this._eventTypeSelectHandler = this._eventTypeSelectHandler.bind(this);
     this._eventDestinationInputHandler = this._eventDestinationInputHandler.bind(this);
+    this._eventDestinationChangeHandler = this._eventDestinationChangeHandler.bind(this);
     this._eventPriceChangeHandler = this._eventPriceChangeHandler.bind(this);
     this._eventPriceInputHandler = this._eventPriceInputHandler.bind(this);
     this._editClickHandler = this._editClickHandler.bind(this);
@@ -208,34 +213,8 @@ export default class editForm extends Abstract { // название класс�
     return generateForm(this._data);
   }
 
-  updateData(update, justDataUpdating) {
-    if (!update) {
-      return;
-    }
-
-    this._data = Object.assign(
-      {},
-      this._data,
-      update,
-    );
-
-    if (justDataUpdating) {
-      return;
-    }
-
-    this.updateElement();
-  }
-
-  updateElement() {
-    const prevElement = this.getElement();
-    const parent = prevElement.parentElement;
-    this.removeElement();
-
-    const newElement = this.getElement();
-
-    parent.replaceChild(newElement, prevElement);
-
-    this.restoreHandlers();
+  reset(event) {
+    this.updateData( EditForm.parseEventToData(event));
   }
 
   restoreHandlers() { // restore handlers
@@ -245,7 +224,7 @@ export default class editForm extends Abstract { // название класс�
     this.setEditClickHandler(this._callback.editClick);
   }
 
-  _eventTypeSelectHandler(evt) { // тип точки маршрута, нужно показать соответствующий типу набор дополнительных опций.
+  _eventTypeSelectHandler(evt) {
     evt.preventDefault();
     const value = evt.target.parentElement.querySelector('input').value;
 
@@ -257,33 +236,53 @@ export default class editForm extends Abstract { // название класс�
 
   _eventDestinationInputHandler(evt) { // пункт назначения
     if(!evt.target.value.length) {
-      evt.target.placeholder = 'Enter or select city name';
+      evt.target.setCustomValidity('Поле не может быть пустым, введите названия города или выберите из списка.');
     }
+    else {
+      evt.target.setCustomValidity('');
+    }
+
+    evt.target.reportValidity();
   }
 
-  _eventDestinationChangeHandler() {
-    // this.updateData({
-    //   'description': generateTitle(DESCRIPTION),
-    //   'name': genRandomItemFrom(CITIES),
-    //   'pictures': generatePictures(IMAGES_DESCRIPTION),
-    // }, true);
+  _eventDestinationChangeHandler(evt) {
+    const selectedDestination = getDestinationByName(evt.target.value, destinations);
+
+    if(!selectedDestination) {
+      evt.target.setCustomValidity('Данный город недоступен для выбора, используйте другой');
+      evt.target.reportValidity();
+    }
+    else {
+      this.updateData({
+        destination: {
+          description: selectedDestination.description,
+          name: evt.target.value,
+          pictures: selectedDestination.pictures,
+        },
+      });
+    }
+
   }
 
   _eventPriceChangeHandler(evt) { // change input price
-    const price = Number(evt.target.value);
-
-    if (price <= 0) {
-      evt.target.value = '1'; // что тут вернуть, текущее значение?
-    }
-
     this.updateData({
       'base_price': evt.target.value,
     }, true);
   }
 
   _eventPriceInputHandler(evt) {
-    console.log(typeof evt.target.value); // eslint-disable-line
-    return evt.target.value.replace(/[^0-9]/, ''); // почему эта казлина не реплейсит, я уже все регулярки перепробывал
+    evt.target.value = evt.target.value.replace(/[^0-9]/, '');
+
+    const price = Number(evt.target.value);
+
+    if (!price || price === 0) {
+      evt.target.setCustomValidity('Цена не может быть пустым полем или равна нулю.');
+    }
+    else {
+      evt.target.setCustomValidity('');
+    }
+
+    evt.target.reportValidity();
   }
 
   _editClickHandler(evt) {
@@ -293,7 +292,7 @@ export default class editForm extends Abstract { // название класс�
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit(editForm.parseDataToEvent(this._data));
+    this._callback.formSubmit(EditForm.parseDataToEvent(this._data));
   }
 
   _formRemoveHandler(evt) {
@@ -305,7 +304,7 @@ export default class editForm extends Abstract { // название класс�
   _setInnerHandlers() { // обработчики событий View
     this.getElement().querySelector('.event__type-list').addEventListener('click', this._eventTypeSelectHandler);
     this.getElement().querySelector('.event__input--destination').addEventListener('input', this._eventDestinationInputHandler);
-    this.getElement().querySelector('.event__input--destination').addEventListener('input', this._eventDestinationChangeHandler);
+    this.getElement().querySelector('.event__input--destination').addEventListener('change', this._eventDestinationChangeHandler);
     this.getElement().querySelector('.event__input--price').addEventListener('change', this._eventPriceChangeHandler);
     this.getElement().querySelector('.event__input--price').addEventListener('input', this._eventPriceInputHandler);
   }

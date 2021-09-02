@@ -12,16 +12,11 @@ const generateDistanation = () => (
   }
 );
 
-// const generateDistanations = () => CITIES.map((city) => Object.assign({}, generateDistanation(), {name: city}));
+const generateDistanations = () => CITIES.map((city) => Object.assign({}, generateDistanation(), {name: city}));
 
-// const cityValue = 'Amsterdam';
-// const destinations1 = generateDistanations();
+const destinations = generateDistanations();
 
-// const getDestinationByName = (cityValue, destinations) => {
-//   return destinations.find((city) => cityValue === city.name);
-// }
-
-// console.log(getDestinationByName(cityValue, destinations1));
+const getDestinationByName = (cityValue, dest) => dest.find((city) => cityValue === city.name);
 
 const generateEvent = () => {
   const newDate = generateFromToDate();
@@ -58,4 +53,4 @@ const findOfferByType = (typeValue, offers) => {
   return foundOffer.offers;
 };
 
-export { generateEvent, offersMock, findOfferByType };
+export { generateEvent, offersMock, findOfferByType, getDestinationByName, destinations };
