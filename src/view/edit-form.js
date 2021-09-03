@@ -175,10 +175,10 @@ const generateForm = (data) => {
             <span class="visually-hidden">${basePrice}</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
+          <input class="event__input event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
         </div>
 
-        <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
+        <button class="event__save-btn btn btn--blue" type="submit">Save</button>
         <button class="event__reset-btn" type="reset">Delete</button>
         <button class="event__rollup-btn" type="button">
           <span class="visually-hidden">Open event</span>
@@ -214,7 +214,7 @@ export default class EditForm extends Smart { // название классов
   }
 
   reset(event) {
-    this.updateData( EditForm.parseEventToData(event));
+    this.updateData(EditForm.parseEventToData(event));
   }
 
   restoreHandlers() { // restore handlers
@@ -237,8 +237,10 @@ export default class EditForm extends Smart { // название классов
   _eventDestinationInputHandler(evt) { // пункт назначения
     if(!evt.target.value.length) {
       evt.target.setCustomValidity('Поле не может быть пустым, введите названия города или выберите из списка.');
+      this.getElement().querySelector('.event__save-btn').disabled = true;
     }
     else {
+      this.getElement().querySelector('.event__save-btn').disabled = false;
       evt.target.setCustomValidity('');
     }
 
@@ -249,10 +251,12 @@ export default class EditForm extends Smart { // название классов
     const selectedDestination = getDestinationByName(evt.target.value, destinations);
 
     if(!selectedDestination) {
+      this.getElement().querySelector('.event__save-btn').disabled = true;
       evt.target.setCustomValidity('Данный город недоступен для выбора, используйте другой');
       evt.target.reportValidity();
     }
     else {
+      this.getElement().querySelector('.event__save-btn').disabled = false;
       this.updateData({
         destination: {
           description: selectedDestination.description,
@@ -276,9 +280,11 @@ export default class EditForm extends Smart { // название классов
     const price = Number(evt.target.value);
 
     if (!price || price === 0) {
+      this.getElement().querySelector('.event__save-btn').disabled = true;
       evt.target.setCustomValidity('Цена не может быть пустым полем или равна нулю.');
     }
     else {
+      this.getElement().querySelector('.event__save-btn').disabled = false;
       evt.target.setCustomValidity('');
     }
 
