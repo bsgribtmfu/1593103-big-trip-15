@@ -164,10 +164,10 @@ const generateForm = (data) => {
 
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizeEventDate(dateFrom, 'DD/MM/YY')} ${humanizeEventDate(dateFrom, 'HH:MM')}">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizeEventDate(dateFrom, 'DD/MM/YY')} ${humanizeEventDate(dateFrom, 'HH:mm')}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizeEventDate(dateTo, 'DD/MM/YY')} ${humanizeEventDate(dateTo, 'HH:MM')}">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizeEventDate(dateTo, 'DD/MM/YY')} ${humanizeEventDate(dateTo, 'HH:mm')}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -193,10 +193,12 @@ const generateForm = (data) => {
   );
 };
 
-export default class EditForm extends Smart { // название классов с заглавной буквы?
+export default class EditForm extends Smart {
   constructor (event) {
     super();
     this._data = EditForm.parseEventToData(event);
+    this._datepicker = null;
+
     this._eventTypeSelectHandler = this._eventTypeSelectHandler.bind(this);
     this._eventDestinationInputHandler = this._eventDestinationInputHandler.bind(this);
     this._eventDestinationChangeHandler = this._eventDestinationChangeHandler.bind(this);
@@ -234,7 +236,7 @@ export default class EditForm extends Smart { // название классов
     });
   }
 
-  _eventDestinationInputHandler(evt) { // пункт назначения
+  _eventDestinationInputHandler(evt) {
     if(!evt.target.value.length) {
       evt.target.setCustomValidity('Поле не может быть пустым, введите названия города или выберите из списка.');
       this.getElement().querySelector('.event__save-btn').disabled = true;
