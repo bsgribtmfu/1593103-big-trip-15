@@ -1,6 +1,8 @@
 import { humanizeEventDate } from '../utils/date.js';
 import { getLastWord } from '../utils/common.js';
-import Abstract from './abstract.js';
+import { offersMock, findOfferByType, getDestinationByName, destinations} from '../mock/data-structure.js';
+
+import Smart from './smart.js';
 
 const generateDestinationPhotos = (pictures) => {
 
@@ -15,8 +17,21 @@ const generateDestinationPhotos = (pictures) => {
   );
 };
 
-const generateOffers = (offers) => {
+const generateDistanationSection = (distanation) => {
+  if(!distanation.description || !distanation.pictures) {
+    return '';
+  }
 
+  return (
+    `<section class="event__section event__section--destination">
+      <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+      <p class="event__destination-description">${distanation.description}</p>
+      ${generateDestinationPhotos(distanation.pictures)}
+    </section>`
+  );
+};
+
+const generateOffers = (offers) => {
   const offersElements = offers.map((offerItem) => {
     const word = getLastWord(offerItem.title);
 
@@ -32,28 +47,46 @@ const generateOffers = (offers) => {
     );
   });
 
-  return offersElements;
+  return offersElements.join('');
 };
 
-const generateForm = (event) => {
+const generateOffersSection = (offers) => {
+
+  const offersElements = generateOffers(offers);
+
+
+  if(!offers.length) {
+    return '';
+  }
+
+  return (
+    `<section class="event__section  event__section--offers">
+      <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+
+      <div class="event__available-offers">
+        ${offersElements}
+      </div>
+    </section>`
+  );
+};
+
+const generateDistanations = () => destinations.map((destination) => `<option value="${destination.name}"></option>`).join('');
+
+const generateForm = (data) => {
   const {
     base_price: basePrice,
     date_from: dateFrom,
     date_to: dateTo,
-    destination: {
-      name,
-      description,
-      pictures,
-    },
+    destination,
     offers,
     type,
-  } = event;
+  } = data;
 
-  const offersElements = generateOffers(offers);
-  const destinationPhotos = generateDestinationPhotos(pictures);
+  const destinationOptions = generateDistanations();
 
   return (
-    `<form class="event event--edit" action="#" method="post">
+    `<li class="trip-events__item">
+    <form class="event event--edit" action="#" method="post">
       <header class="event__header">
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -123,20 +156,18 @@ const generateForm = (event) => {
           <label class="event__label  event__type-output" for="event-destination-1">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${name}" list="destination-list-1">
+          <input class="event__input event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
           <datalist id="destination-list-1">
-            <option value="Amsterdam"></option>
-            <option value="Geneva"></option>
-            <option value="${name}"></option>
+            ${destinationOptions}
           </datalist>
         </div>
 
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizeEventDate(dateFrom, 'DD/MM/YY')} ${humanizeEventDate(dateFrom, 'HH:MM')}">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizeEventDate(dateFrom, 'DD/MM/YY')} ${humanizeEventDate(dateFrom, 'HH:mm')}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizeEventDate(dateTo, 'DD/MM/YY')} ${humanizeEventDate(dateTo, 'HH:MM')}">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizeEventDate(dateTo, 'DD/MM/YY')} ${humanizeEventDate(dateTo, 'HH:mm')}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -144,46 +175,122 @@ const generateForm = (event) => {
             <span class="visually-hidden">${basePrice}</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
+          <input class="event__input event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
         </div>
 
-        <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
+        <button class="event__save-btn btn btn--blue" type="submit">Save</button>
         <button class="event__reset-btn" type="reset">Delete</button>
         <button class="event__rollup-btn" type="button">
           <span class="visually-hidden">Open event</span>
         </button>
       </header>
       <section class="event__details">
-        <section class="event__section  event__section--offers">
-          <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-
-          <div class="event__available-offers">
-            ${offersElements.join('')}
-          </div>
-        </section>
-
-        <section class="event__section  event__section--destination">
-          <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-          <p class="event__destination-description">${description}</p>
-
-          ${destinationPhotos}
-        </section>
+        ${generateOffersSection(offers)}
+        ${generateDistanationSection(destination)}
       </section>
-    </form>`
+    </form>
+    </li>`
   );
 };
 
-export default class editForm extends Abstract {
+export default class EditForm extends Smart {
   constructor (event) {
     super();
-    this._event = event;
+    this._data = EditForm.parseEventToData(event);
+    this._datepicker = null;
+
+    this._eventTypeSelectHandler = this._eventTypeSelectHandler.bind(this);
+    this._eventDestinationInputHandler = this._eventDestinationInputHandler.bind(this);
+    this._eventDestinationChangeHandler = this._eventDestinationChangeHandler.bind(this);
+    this._eventPriceChangeHandler = this._eventPriceChangeHandler.bind(this);
+    this._eventPriceInputHandler = this._eventPriceInputHandler.bind(this);
     this._editClickHandler = this._editClickHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._formRemoveHandler = this._formRemoveHandler.bind(this);
+
+    this._setInnerHandlers();
   }
 
   getTemplate() {
-    return generateForm(this._event);
+    return generateForm(this._data);
+  }
+
+  reset(event) {
+    this.updateData(EditForm.parseEventToData(event));
+  }
+
+  restoreHandlers() { // restore handlers
+    this._setInnerHandlers();
+    this.setEditDeliteClickHandler(this._callback.deliteSubmit);
+    this.setEditSubmitHandler(this._callback.formSubmit);
+    this.setEditClickHandler(this._callback.editClick);
+  }
+
+  _eventTypeSelectHandler(evt) {
+    evt.preventDefault();
+    const value = evt.target.parentElement.querySelector('input').value;
+
+    this.updateData({
+      type: value,
+      offers: findOfferByType(value, offersMock),
+    });
+  }
+
+  _eventDestinationInputHandler(evt) {
+    if(!evt.target.value.length) {
+      evt.target.setCustomValidity('Поле не может быть пустым, введите названия города или выберите из списка.');
+      this.getElement().querySelector('.event__save-btn').disabled = true;
+    }
+    else {
+      this.getElement().querySelector('.event__save-btn').disabled = false;
+      evt.target.setCustomValidity('');
+    }
+
+    evt.target.reportValidity();
+  }
+
+  _eventDestinationChangeHandler(evt) {
+    const selectedDestination = getDestinationByName(evt.target.value, destinations);
+
+    if(!selectedDestination) {
+      this.getElement().querySelector('.event__save-btn').disabled = true;
+      evt.target.setCustomValidity('Данный город недоступен для выбора, используйте другой');
+      evt.target.reportValidity();
+    }
+    else {
+      this.getElement().querySelector('.event__save-btn').disabled = false;
+      this.updateData({
+        destination: {
+          description: selectedDestination.description,
+          name: evt.target.value,
+          pictures: selectedDestination.pictures,
+        },
+      });
+    }
+
+  }
+
+  _eventPriceChangeHandler(evt) { // change input price
+    this.updateData({
+      'base_price': evt.target.value,
+    }, true);
+  }
+
+  _eventPriceInputHandler(evt) {
+    evt.target.value = evt.target.value.replace(/[^0-9]/, '');
+
+    const price = Number(evt.target.value);
+
+    if (!price || price === 0) {
+      this.getElement().querySelector('.event__save-btn').disabled = true;
+      evt.target.setCustomValidity('Цена не может быть пустым полем или равна нулю.');
+    }
+    else {
+      this.getElement().querySelector('.event__save-btn').disabled = false;
+      evt.target.setCustomValidity('');
+    }
+
+    evt.target.reportValidity();
   }
 
   _editClickHandler(evt) {
@@ -193,7 +300,7 @@ export default class editForm extends Abstract {
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit(this._event);
+    this._callback.formSubmit(EditForm.parseDataToEvent(this._data));
   }
 
   _formRemoveHandler(evt) {
@@ -202,18 +309,39 @@ export default class editForm extends Abstract {
     this._element = null;
   }
 
-  setEditClickHandler(callback) {
+  _setInnerHandlers() { // обработчики событий View
+    this.getElement().querySelector('.event__type-list').addEventListener('click', this._eventTypeSelectHandler);
+    this.getElement().querySelector('.event__input--destination').addEventListener('input', this._eventDestinationInputHandler);
+    this.getElement().querySelector('.event__input--destination').addEventListener('change', this._eventDestinationChangeHandler);
+    this.getElement().querySelector('.event__input--price').addEventListener('change', this._eventPriceChangeHandler);
+    this.getElement().querySelector('.event__input--price').addEventListener('input', this._eventPriceInputHandler);
+  }
+
+  setEditClickHandler(callback) { // button 'rollup'
     this._callback.editClick = callback;
     this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._editClickHandler);
   }
 
-  setEditSubmitHandler(callback) {
+  setEditSubmitHandler(callback) { // button 'Save'
     this._callback.formSubmit = callback;
-    this.getElement().addEventListener('submit', this._formSubmitHandler);
+    this.getElement().querySelector('form').addEventListener('submit', this._formSubmitHandler);
   }
 
-  setEditDeliteClickHandler(callback) {
+  setEditDeliteClickHandler(callback) { // button 'Delete'
     this._callback.deliteSubmit = callback;
     this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formRemoveHandler);
+  }
+
+  static parseEventToData(event) {
+    return Object.assign(
+      {},
+      event,
+    );
+  }
+
+  static parseDataToEvent(data) {
+    data = Object.assign({}, data);
+
+    return data;
   }
 }

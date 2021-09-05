@@ -1,6 +1,19 @@
 import { humanizeEventDate, getDuration } from '../utils/date.js';
-import { genRandomItemFrom} from '../utils/common.js';
 import Abstract from './abstract.js';
+
+const generateCheckedOffers = (offers) => { // draft, дописать логику проверка на checked
+  if(!offers.length) {
+    return '';
+  }
+
+  return offers.map((offer) => (
+    `<li class="event__offer">
+      <span class="event__offer-title">${offer.title}</span>
+        &plus;&euro;&nbsp;
+      <span class="event__offer-price">${offer.price}</span>
+    </li>`
+  )).join('');
+};
 
 const generateEvent = (event) => {
   const {
@@ -16,10 +29,6 @@ const generateEvent = (event) => {
   } = event;
 
   const diffDuration = getDuration(dateFrom, dateTo);
-
-  const offer = genRandomItemFrom(offers);
-
-  const { title, price } = offer;
 
   const buttonFavorite = isFavorite !== true || 'event__favorite-btn--active';
 
@@ -44,11 +53,7 @@ const generateEvent = (event) => {
         </p>
         <h4 class="visually-hidden">Offers:</h4>
         <ul class="event__selected-offers">
-          <li class="event__offer">
-            <span class="event__offer-title">${title}</span>
-            &plus;&euro;&nbsp;
-            <span class="event__offer-price">${price}</span>
-          </li>
+        ${generateCheckedOffers(offers)}
         </ul>
         <button class="event__favorite-btn ${buttonFavorite}" type="button">
           <span class="visually-hidden">Add to favorite</span>

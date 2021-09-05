@@ -6,11 +6,17 @@ import { getRandomIntInclusive, genRandomItemFrom } from '../utils/common.js';
 
 const generateDistanation = () => (
   {
-    'description': generateTitle(DESCRIPTION),
-    'name': genRandomItemFrom(CITIES),
-    'pictures': generatePictures(IMAGES_DESCRIPTION),
+    description: generateTitle(DESCRIPTION),
+    name: genRandomItemFrom(CITIES),
+    pictures: generatePictures(IMAGES_DESCRIPTION),
   }
 );
+
+const generateDistanations = () => CITIES.map((city) => Object.assign({}, generateDistanation(), {name: city}));
+
+const destinations = generateDistanations();
+
+const getDestinationByName = (cityValue, dest) => dest.find((city) => cityValue === city.name);
 
 const generateEvent = () => {
   const newDate = generateFromToDate();
@@ -27,4 +33,24 @@ const generateEvent = () => {
   };
 };
 
-export { generateEvent };
+const getOffersStructure = () => {
+  const offers = [];
+
+  TYPES.forEach((type) => {
+    offers.push({
+      'type': type,
+      'offers': generateOffers(TITLES, PRICES),
+    });
+  });
+
+  return offers;
+};
+
+const offersMock = getOffersStructure();
+
+const findOfferByType = (typeValue, offers) => {
+  const foundOffer = offers.find((offer) => typeValue === offer.type);
+  return foundOffer.offers;
+};
+
+export { generateEvent, offersMock, findOfferByType, getDestinationByName, destinations };

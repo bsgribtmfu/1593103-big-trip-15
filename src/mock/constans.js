@@ -12,6 +12,7 @@ const TYPES = [
   'bus',
   'train',
   'ship',
+  'transport',
   'drive',
   'flight',
   'check-in',

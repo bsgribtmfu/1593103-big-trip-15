@@ -68,6 +68,7 @@ export default class Trip {
   }
 
   _handleEventChange(updatedEvent) {
+
     this._events = updateItem(this._events, updatedEvent);
     this._sourcedBoardTasks = updateItem(this._sourcedEvents, updatedEvent);
     this._eventPresenter.get(updatedEvent.id).init(updatedEvent);
