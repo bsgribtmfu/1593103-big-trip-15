@@ -14,6 +14,8 @@ const getLastWord = (offer) => {
   return words[words.length - 1];
 };
 
+const getFirstLetter = (key) => key.charAt(0).toUpperCase();
+
 const updateItem = (items, update) => {
   const index = items.findIndex((item) => item.id === update.id);
 
@@ -30,4 +32,4 @@ const updateItem = (items, update) => {
 
 const sortByPrice = (a, b) => b.base_price - a.base_price;
 
-export { getRandomIntInclusive, genRandomItemFrom, getLastWord, updateItem, sortByPrice };
+export { getRandomIntInclusive, genRandomItemFrom, getLastWord, updateItem, sortByPrice, getFirstLetter };

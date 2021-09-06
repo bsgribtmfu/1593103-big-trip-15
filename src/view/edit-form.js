@@ -4,6 +4,10 @@ import { offersMock, findOfferByType, getDestinationByName, destinations} from '
 
 import Smart from './smart.js';
 
+import flatpickr from 'flatpickr';
+
+import '../../node_modules/flatpickr/dist/flatpickr.min.css';
+
 const generateDestinationPhotos = (pictures) => {
 
   const pucturesElements = pictures.map((picture) => `<img class="event__photo" src="${picture.src}" alt=${picture.description}">`);
@@ -197,7 +201,8 @@ export default class EditForm extends Smart {
   constructor (event) {
     super();
     this._data = EditForm.parseEventToData(event);
-    this._datepicker = null;
+    this._datepickerStart = null;
+    this._datepickerEnd = null;
 
     this._eventTypeSelectHandler = this._eventTypeSelectHandler.bind(this);
     this._eventDestinationInputHandler = this._eventDestinationInputHandler.bind(this);
@@ -207,7 +212,10 @@ export default class EditForm extends Smart {
     this._editClickHandler = this._editClickHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._formRemoveHandler = this._formRemoveHandler.bind(this);
+    this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
+    this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
 
+    this._setDatepicker();
     this._setInnerHandlers();
   }
 
@@ -220,6 +228,7 @@ export default class EditForm extends Smart {
   }
 
   restoreHandlers() { // restore handlers
+    this._setDatepicker();
     this._setInnerHandlers();
     this.setEditDeliteClickHandler(this._callback.deliteSubmit);
     this.setEditSubmitHandler(this._callback.formSubmit);
@@ -317,6 +326,42 @@ export default class EditForm extends Smart {
     this.getElement().querySelector('.event__input--price').addEventListener('input', this._eventPriceInputHandler);
   }
 
+  _setDatepicker() {
+    if (this._datepickerStart) {
+      this._datepickerStart.destroy();
+      this._datepickerStart = null;
+    }
+
+    if (this._datepickerEnd) {
+      this._datepickerEnd.destroy();
+      this._datepickerEnd = null;
+    }
+
+    this._datepickerStart = flatpickr(
+      this.getElement().querySelector('#event-start-time-1'),
+      {
+        dateFormat: 'd/m/y H:i',
+        enableTime: true,
+        'time_24hr': true,
+        maxDate: this._data.date_to,
+        defaultDate: this._data.date_from,
+        onChange: this._startDateChangeHandler,
+      },
+    );
+
+    this._datepickerEnd = flatpickr(
+      this.getElement().querySelector('#event-end-time-1'),
+      {
+        dateFormat: 'd/m/y H:i',
+        enableTime: true,
+        'time_24hr': true,
+        minDate: this._data.date_from,
+        defaultDate: this._data.date_to,
+        onChange: this._endDateChangeHandler,
+      },
+    );
+  }
+
   setEditClickHandler(callback) { // button 'rollup'
     this._callback.editClick = callback;
     this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._editClickHandler);
@@ -330,6 +375,18 @@ export default class EditForm extends Smart {
   setEditDeliteClickHandler(callback) { // button 'Delete'
     this._callback.deliteSubmit = callback;
     this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formRemoveHandler);
+  }
+
+  _startDateChangeHandler([dateFrom]) {
+    this.updateData({
+      'date_from': dateFrom,
+    });
+  }
+
+  _endDateChangeHandler([dateTo]) {
+    this.updateData({
+      'date_to': dateTo,
+    });
   }
 
   static parseEventToData(event) {
