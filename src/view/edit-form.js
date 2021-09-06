@@ -342,9 +342,9 @@ export default class EditForm extends Smart {
       {
         dateFormat: 'd/m/y H:i',
         enableTime: true,
-        ['time_24hr']: true,
+        'time_24hr': true,
         maxDate: this._data.date_to,
-        // defaultDate: this._data.date_from,
+        defaultDate: this._data.date_from,
         onChange: this._startDateChangeHandler,
       },
     );
@@ -354,9 +354,9 @@ export default class EditForm extends Smart {
       {
         dateFormat: 'd/m/y H:i',
         enableTime: true,
-        ['time_24hr']: true,
+        'time_24hr': true,
         minDate: this._data.date_from,
-        // defaultDate: this._data.date_from,
+        defaultDate: this._data.date_to,
         onChange: this._endDateChangeHandler,
       },
     );
@@ -376,7 +376,8 @@ export default class EditForm extends Smart {
     this._callback.deliteSubmit = callback;
     this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formRemoveHandler);
   }
-  _startDateChangeHandler([dateFrom]) { // eslint-disable-line
+
+  _startDateChangeHandler([dateFrom]) {
     this.updateData({
       'date_from': dateFrom,
     });

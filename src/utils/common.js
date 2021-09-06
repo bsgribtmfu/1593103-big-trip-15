@@ -14,7 +14,7 @@ const getLastWord = (offer) => {
   return words[words.length - 1];
 };
 
-const getFirstLetter = (key) => key.split('')[0].toUpperCase();
+const getFirstLetter = (key) => key.charAt(0).toUpperCase();
 
 const updateItem = (items, update) => {
   const index = items.findIndex((item) => item.id === update.id);
