@@ -58,8 +58,6 @@ const removeElement = (component) => {
     return;
   }
 
-  console.log('component', component);
-
   component.getElement().remove();
   component.removeElement();
 };

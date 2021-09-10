@@ -40,7 +40,6 @@ export default class Events extends AbstractObserver {
   }
 
   deleteEvent(updateType, update) {
-    console.log(updateType, update)
     const index = this._events.findIndex((event) => event.id === update.id);
 
     if (index === -1) {
