@@ -13,7 +13,7 @@ const generateSort = () => (
       <label class="trip-sort__btn" for="sort-event">Event</label>
     </div>
 
-    <div class="trip-sort__item  trip-sort__item--time">
+    <div class="trip-sort__item trip-sort__item--time">
       <input id="sort-time" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-time">
       <label class="trip-sort__btn" for="sort-time" data-sort-type="${SortType.TRIP_TIME}">Time</label>
     </div>
@@ -31,7 +31,7 @@ const generateSort = () => (
 );
 
 export default class Sort extends Abstract {
-  constructor() {
+  constructor() { // constructor(currentSortType) принимаем для сравнения и изменения класса активного элемента, но у меня checked у input
     super();
     this._sortTypeChangeHandler = this._sortTypeChangeHandler.bind(this);
   }
@@ -41,11 +41,16 @@ export default class Sort extends Abstract {
   }
 
   _sortTypeChangeHandler(evt) {
-    if (evt.target.tagName !== 'LABEL') {
+    const parentElement = evt.target.parentElement;
+    const isEventInput = parentElement.classList.contains('trip-sort__item--event');
+    const isOfferInput = parentElement.classList.contains('trip-sort__item--offer');
+
+    if (evt.target.tagName !== 'LABEL' || isEventInput || isOfferInput) {
       return;
     }
 
     evt.preventDefault();
+    parentElement.querySelector('.trip-sort__input').checked = true;
     this._callback.sortTypeChange(evt.target.dataset.sortType);
   }
 

@@ -16,20 +16,6 @@ const getLastWord = (offer) => {
 
 const getFirstLetter = (key) => key.charAt(0).toUpperCase();
 
-const updateItem = (items, update) => {
-  const index = items.findIndex((item) => item.id === update.id);
-
-  if (index === -1) {
-    return items;
-  }
-
-  return [
-    ...items.slice(0, index),
-    update,
-    ...items.slice(index + 1),
-  ];
-};
-
 const sortByPrice = (a, b) => b.base_price - a.base_price;
 
-export { getRandomIntInclusive, genRandomItemFrom, getLastWord, updateItem, sortByPrice, getFirstLetter };
+export { getRandomIntInclusive, genRandomItemFrom, getLastWord, sortByPrice, getFirstLetter };

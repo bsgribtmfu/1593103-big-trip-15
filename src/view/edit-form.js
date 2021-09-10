@@ -1,7 +1,6 @@
 import { humanizeEventDate } from '../utils/date.js';
 import { getLastWord } from '../utils/common.js';
 import { offersMock, findOfferByType, getDestinationByName, destinations} from '../mock/data-structure.js';
-
 import Smart from './smart.js';
 
 import flatpickr from 'flatpickr';
@@ -211,7 +210,7 @@ export default class EditForm extends Smart {
     this._eventPriceInputHandler = this._eventPriceInputHandler.bind(this);
     this._editClickHandler = this._editClickHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
-    this._formRemoveHandler = this._formRemoveHandler.bind(this);
+    this._formDeleteHandler = this._formDeleteHandler.bind(this);
     this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
     this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
 
@@ -230,7 +229,7 @@ export default class EditForm extends Smart {
   restoreHandlers() { // restore handlers
     this._setDatepicker();
     this._setInnerHandlers();
-    this.setEditDeliteClickHandler(this._callback.deliteSubmit);
+    this.setEditDeliteClickHandler(this._callback._deleteSubmit);
     this.setEditSubmitHandler(this._callback.formSubmit);
     this.setEditClickHandler(this._callback.editClick);
   }
@@ -312,9 +311,9 @@ export default class EditForm extends Smart {
     this._callback.formSubmit(EditForm.parseDataToEvent(this._data));
   }
 
-  _formRemoveHandler(evt) {
+  _formDeleteHandler(evt) {
     evt.preventDefault();
-    this._callback.deliteSubmit();
+    this._callback._deleteSubmit(EditForm.parseDataToEvent(this._data));
     this._element = null;
   }
 
@@ -373,8 +372,8 @@ export default class EditForm extends Smart {
   }
 
   setEditDeliteClickHandler(callback) { // button 'Delete'
-    this._callback.deliteSubmit = callback;
-    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formRemoveHandler);
+    this._callback._deleteSubmit = callback;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formDeleteHandler);
   }
 
   _startDateChangeHandler([dateFrom]) {

@@ -1,4 +1,5 @@
 import { render, RenderPosition, replaceElement, removeElement } from '../utils/render.js';
+import { UserAction, UpdateType } from '../mock/constans.js';
 
 import Event from '../view/event.js';
 import EditForm from '../view/edit-form.js';
@@ -24,7 +25,7 @@ export default class EventPresenter {
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
     this._handleEditClickRollup = this._handleEditClickRollup.bind(this);
     this._handleEditSubmit = this._handleEditSubmit.bind(this);
-    this._removeEditForm = this._removeEditForm.bind(this);
+    this._deleteEditForm = this._deleteEditForm.bind(this);
   }
 
   init(event) {
@@ -37,9 +38,9 @@ export default class EventPresenter {
     this._editFormComponent = new EditForm(event);
 
     this._eventComponent.setEditClickHandler(this._replaceCardToForm);        // event -> form
-    this._editFormComponent.setEditClickHandler(this._handleEditClickRollup);     // form -> event  | main
+    this._editFormComponent.setEditClickHandler(this._handleEditClickRollup); // form -> event  | rollup
     this._editFormComponent.setEditSubmitHandler(this._handleEditSubmit);     // save | submit
-    this._editFormComponent.setEditDeliteClickHandler(this._removeEditForm);  // form -> event  | delite
+    this._editFormComponent.setEditDeliteClickHandler(this._deleteEditForm);  // form -> event  | remove
     this._eventComponent.setFavoriteClickHandler(this._handleFavoriteClick);  // event favorite button click
 
     if (prevEventComponent === null || prevEditFormComponent === null) {
@@ -70,7 +71,13 @@ export default class EventPresenter {
     removeElement(this._editFormComponent);
   }
 
-  _removeEditForm() {
+  _deleteEditForm(event) {
+    this._changeData(
+      UserAction.DELETE_EVENT,
+      UpdateType.MINOR,
+      event,
+    );
+
     removeElement(this._editFormComponent); // this._element = null AND remove element from DOM
   }
 
@@ -100,13 +107,20 @@ export default class EventPresenter {
     this._replaceFormToCard();
   }
 
-  _handleEditSubmit(event) {
-    this._changeData(event);
+  _handleEditSubmit(event) { // button save
+    this._changeData(
+      UserAction.UPDATE_EVENT,
+      UpdateType.PATCH,
+      event,
+    );
+
     this._replaceFormToCard();
   }
 
   _handleFavoriteClick() {
     this._changeData(
+      UserAction.UPDATE_EVENT,
+      UpdateType.PATCH,
       Object.assign(
         {},
         this._event,

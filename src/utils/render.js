@@ -54,6 +54,12 @@ const createElement = (template) => {
 };
 
 const removeElement = (component) => {
+  if (component === null) {
+    return;
+  }
+
+  console.log('component', component);
+
   component.getElement().remove();
   component.removeElement();
 };

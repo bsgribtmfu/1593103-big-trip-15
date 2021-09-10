@@ -7,6 +7,7 @@ export default class Smart extends Abstract {
   }
 
   updateData(updateData, isUpdate) {
+
     if (!updateData) {
       return;
     }
