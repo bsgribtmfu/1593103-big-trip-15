@@ -110,7 +110,7 @@ export default class EventPresenter {
   _handleEditSubmit(event) { // button save
     this._changeData(
       UserAction.UPDATE_EVENT,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       event,
     );
 

@@ -9,7 +9,7 @@ import Sort from '../view/sort.js';
 import TripInfo from '../view/trip-info.js';
 import EventPresenter from './event.js';
 import Navigation from '../view/navigation.js';
-import Filters from '../view/filters.js';
+// import Filters from '../view/filters.js';
 
 export default class Trip {
   constructor(mainContainer, tripSummaryContainer, navigationContainer, filtersContainer, eventsModel) {
@@ -27,7 +27,8 @@ export default class Trip {
     this._eventsList = new EventsList();
     this._emptyList = new EmptyList();
     this._sort = null;
-    this._filters = new Filters();
+    // this._filters = new Filters();
+    this._tripInfo = new TripInfo(this._eventsModel.getEvents());
 
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
@@ -73,13 +74,13 @@ export default class Trip {
         break;
       case UpdateType.MINOR:
         // - обновить список (например, когда задача ушла в архив)
-        this._clearBoard();
-        this._renderBoard();
+        this._clearTrip();
+        this._renderTrip();
         break;
       case UpdateType.MAJOR:
         // - обновить всю доску (например, при переключении фильтра)
-        this._clearBoard({ resetSortType: true });
-        this._renderBoard();
+        this._clearTrip({ resetSortType: true });
+        this._renderTrip();
         break;
     }
   }
@@ -103,9 +104,9 @@ export default class Trip {
     this._eventPresenter.clear();
   }
 
-  _renderFilters() {
-    render(this._filtersContainer, this._filters, RenderPosition.BEFOREEND);
-  }
+  // _renderFilters() {
+  //   render(this._filtersContainer, this._filters, RenderPosition.BEFOREEND);
+  // }
 
   _renderNavigation() {
     render(this._navigationContainer, this._navigation, RenderPosition.BEFOREEND);
@@ -130,7 +131,6 @@ export default class Trip {
   }
 
   _renderTripInfo() {
-    this._tripInfo = new TripInfo(this._eventsModel.getEvents()); // аргумент тот?
     render(this._tripSummaryContainer, this._tripInfo, RenderPosition.AFTERBEGIN);
   }
 
@@ -144,13 +144,14 @@ export default class Trip {
     events.forEach((event) => this._renderEvent(event));
   }
 
-  _clearBoard({ resetSortType = false } = {}) {
+  _clearTrip({ resetSortType = false } = {}) {
 
     this._eventPresenter.forEach((presenter) => presenter.destroy());
     this._eventPresenter.clear();
 
     removeElement(this._sort);
-    removeElement(this._renderEmptyList);
+    removeElement(this._emptyList);
+    removeElement(this._tripInfo);
 
     if (resetSortType) {
       this._currentSortType = SortType.DEFAULT;
@@ -164,11 +165,11 @@ export default class Trip {
     if (eventCount === 0) {
       this._renderEmptyList();
       this._renderNavigation();
-      this._renderFilters();
+      // this._renderFilters();
       return;
     }
     this._renderNavigation();
-    this._renderFilters();
+    // this._renderFilters();
     this._renderTripInfo();
     this._renderSort();
     this._renderEventsList();

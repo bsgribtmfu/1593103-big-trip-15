@@ -62,4 +62,10 @@ const UpdateType = { // семантическое версионировани�
   MAJOR: 'MAJOR',
 };
 
-export { CITIES, TYPES, TITLES, IMAGES_DESCRIPTION, PRICES, BASE_PRICES, DESCRIPTION, SortType, UserAction, UpdateType };
+const FilterType = {
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+  PAST: 'past',
+};
+
+export { CITIES, TYPES, TITLES, IMAGES_DESCRIPTION, PRICES, BASE_PRICES, DESCRIPTION, SortType, UserAction, UpdateType, FilterType };

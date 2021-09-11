@@ -1,6 +1,7 @@
 import Abstract from './abstract.js';
 
 const generateFilters = () => (
+
   `<form class="trip-filters" action="#" method="get">
     <div class="trip-filters__filter">
       <input id="filter-everything" class="trip-filters__filter-input visually-hidden" type="radio" name="trip-filter" value="everything">
@@ -22,7 +23,26 @@ const generateFilters = () => (
 );
 
 export default class Filter extends Abstract {
+  constructor(filters, currentFilterType) {
+    super();
+    this._filters = filters;
+    this._currentFilter = currentFilterType;
+
+    this._filterTypeChangeHandler = this._filterTypeChangeHandler.bind(this);
+  }
+
   getTemplate() {
+    // console.log(this._filters, this._currentFilter)
     return generateFilters();
+  }
+
+  _filterTypeChangeHandler(evt) {
+    evt.preventDefault();
+    this._callback.filterTypeChange(evt.target.value);
+  }
+
+  setFilterTypeChangeHandler(callback) {
+    this._callback.filterTypeChange = callback;
+    this.getElement().addEventListener('change', this._filterTypeChangeHandler);
   }
 }

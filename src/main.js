@@ -1,7 +1,10 @@
 import { generateEvent } from './mock/data-structure.js';
 
+import FiltersPresenter from './presenter/filter.js';
 import Trip from './presenter/trip.js';
+
 import EventsModel from './model/events.js';
+import FilterModel from './model/filter.js';
 
 const tripMainElement = document.querySelector('.trip-main');
 const navigationContainer = document.querySelector('.trip-controls__navigation');
@@ -11,6 +14,7 @@ const tripEventsElement = document.querySelector('.trip-events');
 const EVENT_COUNT = 20;
 
 const eventsModel = new EventsModel();
+const filtersModel = new FilterModel();
 
 const generateEvents = (count) => {
   const eventElements = [];
@@ -26,4 +30,8 @@ const events = generateEvents(EVENT_COUNT);
 
 eventsModel.setEvents(events); // запись в модель точек событий
 
-new Trip(tripEventsElement, tripMainElement, navigationContainer, filtersContainer, eventsModel).init(events);
+const eventsPresenter = new Trip(tripEventsElement, tripMainElement, navigationContainer, filtersContainer, eventsModel);
+const filterPresenter = new FiltersPresenter(filtersContainer, filtersModel, eventsModel);
+
+eventsPresenter.init();
+filterPresenter.init();

@@ -325,7 +325,12 @@ export default class EditForm extends Smart {
     this.getElement().querySelector('.event__input--price').addEventListener('input', this._eventPriceInputHandler);
   }
 
-  _setDatepicker() {
+  removeElement() {
+    super.removeElement();
+    this._clearDatepicker();
+  }
+
+  _clearDatepicker() {
     if (this._datepickerStart) {
       this._datepickerStart.destroy();
       this._datepickerStart = null;
@@ -335,7 +340,10 @@ export default class EditForm extends Smart {
       this._datepickerEnd.destroy();
       this._datepickerEnd = null;
     }
+  }
 
+  _setDatepicker() {
+    this._clearDatepicker();
     this._datepickerStart = flatpickr(
       this.getElement().querySelector('#event-start-time-1'),
       {
