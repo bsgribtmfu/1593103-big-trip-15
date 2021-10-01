@@ -1,4 +1,4 @@
-import { render, RenderPosition, replace, remove } from '../utils/render.js';
+import { render, RenderPosition, replaceElement, removeElement } from '../utils/render.js';
 import { FilterType, UpdateType } from '../mock/constans.js';
 
 import FilterView from '../view/filters.js';
@@ -30,8 +30,8 @@ export default class Filter {
       return;
     }
 
-    replace(this._filterComponent, prevFilterComponent);
-    remove(prevFilterComponent);
+    replaceElement(this._filterComponent, prevFilterComponent); // надо ли делать replace? данные ведь никак не меняются в фильтрах, а следовательно, что там перерисовывать?
+    removeElement(prevFilterComponent);
   }
 
   _handleModelEvent() {

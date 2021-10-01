@@ -60,6 +60,7 @@ const UpdateType = { // семантическое версионировани�
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT',
 };
 
 const FilterType = {
@@ -68,4 +69,26 @@ const FilterType = {
   PAST: 'past',
 };
 
-export { CITIES, TYPES, TITLES, IMAGES_DESCRIPTION, PRICES, BASE_PRICES, DESCRIPTION, SortType, UserAction, UpdateType, FilterType };
+const NavigationItem = {
+  EVENTS: 'EVENTS',
+  STATISTICS: 'STATISTICS',
+};
+
+const Method = {
+  GET: 'GET',
+  PUT: 'PUT',
+  POST: 'POST',
+  DELETE: 'DELETE',
+};
+
+const SuccessHTTPStatusRange = {
+  MIN: 200,
+  MAX: 299,
+};
+
+const Mode = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING',
+};
+
+export { CITIES, TYPES, TITLES, IMAGES_DESCRIPTION, PRICES, BASE_PRICES, DESCRIPTION, SortType, UserAction, UpdateType, FilterType, NavigationItem, Method, SuccessHTTPStatusRange, Mode };

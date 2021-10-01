@@ -1,13 +1,8 @@
 import { render, RenderPosition, replaceElement, removeElement } from '../utils/render.js';
-import { UserAction, UpdateType } from '../mock/constans.js';
+import { UserAction, UpdateType, Mode } from '../mock/constans.js';
 
 import Event from '../view/event.js';
 import EditForm from '../view/edit-form.js';
-
-const Mode = {
-  DEFAULT: 'DEFAULT',
-  EDITING: 'EDITING',
-};
 
 export default class EventPresenter {
   constructor(eventsListContainer, changeData, changeMode) {
@@ -28,20 +23,24 @@ export default class EventPresenter {
     this._deleteEditForm = this._deleteEditForm.bind(this);
   }
 
-  init(event) {
+  init(event, offers, destinations) {
     this._event = event;
+    this._offers = offers;
+    this._destinations = destinations;
 
     const prevEventComponent = this._eventComponent;
     const prevEditFormComponent = this._editFormComponent;
 
     this._eventComponent = new Event(event);
-    this._editFormComponent = new EditForm(event);
+    this._editFormComponent = new EditForm(event, this._offers, this._destinations);
 
     this._eventComponent.setEditClickHandler(this._replaceCardToForm);        // event -> form
+    this._eventComponent.setFavoriteClickHandler(this._handleFavoriteClick);  // event favorite button click
+
     this._editFormComponent.setEditClickHandler(this._handleEditClickRollup); // form -> event  | rollup
     this._editFormComponent.setEditSubmitHandler(this._handleEditSubmit);     // save | submit
     this._editFormComponent.setEditDeliteClickHandler(this._deleteEditForm);  // form -> event  | remove
-    this._eventComponent.setFavoriteClickHandler(this._handleFavoriteClick);  // event favorite button click
+    // this._editFormComponent.setOffersClickHandler(this._offersChangeHandler); // offers click handlers
 
     if (prevEventComponent === null || prevEditFormComponent === null) {
       render(this._eventsListContainer, this._eventComponent, RenderPosition.BEFOREEND);
@@ -56,7 +55,7 @@ export default class EventPresenter {
       replaceElement(this._editFormComponent, prevEditFormComponent);
     }
 
-    removeElement(prevEventComponent);     // this._element = null AND remove element from DOM
+    removeElement(prevEventComponent);
     removeElement(prevEditFormComponent);
   }
 

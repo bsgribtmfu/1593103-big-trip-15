@@ -5,7 +5,7 @@ import duration from 'dayjs/plugin/duration';
 
 dayjs.extend(duration);
 
-const sortByDate = (events) => events.sort((a, b) => dayjs(a.date_from) - dayjs(b.date_from));
+const sortByDate = (a, b) => dayjs(a.date_from) - dayjs(b.date_from);
 
 const getDiff = (from, to) => dayjs(to).diff(dayjs(from));
 
@@ -27,6 +27,27 @@ const humanizeEventDurationDate = (date) => {
     });
 
   return resultDateDiff;
+};
+
+export const msToTime = (duration) => {
+  const milliseconds = parseInt((duration % 1000) / 100);
+  const seconds = Math.floor((duration / 1000) % 60);
+  const minutes = Math.floor((duration / (1000 * 60)) % 60);
+  const hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+  const years = Math.floor(duration / (1000 * 60 * 60 * 24 * 30 * 12));
+  const months = Math.floor(duration / (1000 * 60 * 60 * 24 * 30) % 12);
+  const days = Math.floor(duration / (1000 * 60 * 60 * 24) % 30);
+
+  return ({
+    years,
+    months,
+    days,
+    hours,
+    minutes,
+    seconds,
+    milliseconds,
+  });
+
 };
 
 export {

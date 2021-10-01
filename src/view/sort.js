@@ -41,15 +41,16 @@ export default class Sort extends Abstract {
   }
 
   _sortTypeChangeHandler(evt) {
+    evt.preventDefault();
+
     const parentElement = evt.target.parentElement;
     const isEventInput = parentElement.classList.contains('trip-sort__item--event');
     const isOfferInput = parentElement.classList.contains('trip-sort__item--offer');
 
-    if (evt.target.tagName !== 'LABEL' || isEventInput || isOfferInput) {
+    if (evt.target.tagName !== 'LABEL' || isOfferInput || isEventInput) {
       return;
     }
 
-    evt.preventDefault();
     parentElement.querySelector('.trip-sort__input').checked = true;
     this._callback.sortTypeChange(evt.target.dataset.sortType);
   }

@@ -38,8 +38,8 @@ const getOffersStructure = () => {
 
   TYPES.forEach((type) => {
     offers.push({
-      'type': type,
-      'offers': generateOffers(TITLES, PRICES),
+      type: type,
+      offers: generateOffers(TITLES, PRICES),
     });
   });
 

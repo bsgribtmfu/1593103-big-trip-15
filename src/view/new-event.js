@@ -1,24 +1,21 @@
 import { humanizeEventDate } from '../utils/date.js';
 import { getLastWord } from '../utils/common.js';
 import { findOfferByType, getDestinationByName } from '../mock/data-structure.js';
-
 import Smart from './smart.js';
 
 import flatpickr from 'flatpickr';
 
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
-// ---------- TYPE LIST ----------
 const typeItemTemplate = (type, currentType, id) => (
   `<div class="event__type-item">
-    <input id="event-type-${type}-${id}" class="event__type-input visually-hidden" type="radio" name="event-type" value="${type}" ${type === currentType ? 'checked' : ''}>
+    <input id="event-type-${type}-${id}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}" ${type === currentType ? 'checked' : ''}>
     <label class="event__type-label event__type-label--${type}" for="event-type-${type}-${id}">${type}</label>
   </div>`
 );
 
-const generateTypeItems = (allOffers, currentType) => allOffers.map((offer, id) => typeItemTemplate(offer.type, currentType, id)).join('');
+const generateTypeItems = (offers, currentType) => offers.map((offer, id) => typeItemTemplate(offer.type, currentType, id)).join('');
 
-// ---------- PHOTOS ----------
 const generateDestinationPhotos = (pictures) => {
 
   const pucturesElements = pictures.map((picture) => `<img class="event__photo" src="${picture.src}" alt=${picture.description}">`);
@@ -46,38 +43,43 @@ const generateDistanationSection = (distanation) => {
   );
 };
 
-// ---------- OFFERS FOR POINT ----------
-const generateOffers = (pointType, pointOffers, avalibleOffers, isChecked1) => {
+const generateOffers = (pointType, avalibleOffers) => {
+  const newAllOffers = findOfferByType(pointType, avalibleOffers);
 
-  const newAllOffers = findOfferByType(pointType, avalibleOffers); // массив офферов из доступных офферов
+  const offersElements = newAllOffers.map((offerItem) => {
 
-  const isChecked = (offer) => pointOffers.map((pointOffer) => pointOffer.title).includes(offer.title) ? 'checked' : '';
+    const word = getLastWord(offerItem.title);
 
-  const offersElements = newAllOffers.map((offer, id) => (
-    `<div class="event__offer-selector">
-      <input class="event__offer-checkbox visually-hidden" data-title="${offer.title}" data-price="${offer.price}" id="event-offer-${getLastWord(offer.title)}-${id}" type="checkbox" name="event-offer-${getLastWord(offer.title)}" ${isChecked(offer)} ${isChecked1 ? 'checked' : ''}>
-      <label class="event__offer-label" for="event-offer-${getLastWord(offer.title)}-${id}">
-        <span class="event__offer-title">${offer.title}</span>
-        &plus;&euro;&nbsp;
-        <span class="event__offer-price">${offer.price}</span>
-      </label>
-    </div>`
-  ));
+    return (
+      `<div class="event__offer-selector">
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${word}-1" type="checkbox" name="event-offer-${word}">
+        <label class="event__offer-label" for="event-offer-${word}-1">
+          <span class="event__offer-title">${offerItem.title}</span>
+          &plus;&euro;&nbsp;
+          <span class="event__offer-price">${offerItem.price}</span>
+        </label>
+      </div>`
+    );
+  });
 
   return offersElements.join('');
 };
 
-const generateOffersSection = (type, offers, avalibleOffers, isChecked) => {
+const generateOffersSection = (type, avalibleOffers) => {
+
+  const offersElements = generateOffers(type, avalibleOffers);
+
+
   if(!avalibleOffers.length) {
     return '';
   }
 
   return (
-    `<section class="event__section event__section--offers">
-      <h3 class="event__section-title event__section-title--offers">Offers</h3>
+    `<section class="event__section  event__section--offers">
+      <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
       <div class="event__available-offers">
-        ${generateOffers(type, offers, avalibleOffers, isChecked)}
+        ${offersElements}
       </div>
     </section>`
   );
@@ -87,14 +89,18 @@ const generateDistanations = (destinations) => destinations.map((destination) =>
 
 const generateForm = (data, avalibleOffers, destinations) => {
   const {
-    base_price: basePrice,
-    date_from: dateFrom,
-    date_to: dateTo,
+    'base_price': basePrice,
+    'date_from': dateFrom,
+    'date_to': dateTo,
     destination,
-    offers,
     type,
-    isChecked,
   } = data;
+
+  const isDisabled = !destination.name || !basePrice ? 'disabled' : '';
+
+  // console.log('isDisabled:', isDisabled);
+  // console.log('destination.name:', destination.name);
+  // console.log('basePrice', basePrice);
 
   const destinationOptions = generateDistanations(destinations);
 
@@ -143,40 +149,35 @@ const generateForm = (data, avalibleOffers, destinations) => {
             <input class="event__input event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
           </div>
 
-          <button class="event__save-btn btn btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">Delete</button>
-          <button class="event__rollup-btn" type="button">
-            <span class="visually-hidden">Open event</span>
-          </button>
+          <button class="event__save-btn btn btn--blue" type="submit" ${isDisabled}>Save</button>
+          <button class="event__reset-btn" type="reset">Cancel</button>
         </header>
         <section class="event__details">
-          ${generateOffersSection(type, offers, avalibleOffers, isChecked)}
-          ${generateDistanationSection(destination)}
+          ${generateOffersSection(type, avalibleOffers)}
+          ${generateDistanationSection(destinations)}
         </section>
       </form>
     </li>`
   );
 };
 
-export default class EditForm extends Smart {
-  constructor (event, offers, destinations) {
+export default class NewEvent extends Smart {
+  constructor (event, offers, destination) {
     super();
+    this._data = NewEvent.parseEventToData(event);
     this._offers = offers;
-    this._destinations = destinations;
+    this._destination = destination;
 
-    this._data = EditForm.parseEventToData(event);
     this._datepickerStart = null;
     this._datepickerEnd = null;
 
     this._eventTypeSelectHandler = this._eventTypeSelectHandler.bind(this);
     this._eventDestinationInputHandler = this._eventDestinationInputHandler.bind(this);
     this._eventDestinationChangeHandler = this._eventDestinationChangeHandler.bind(this);
-    this._eventPriceChangeHandler = this._eventPriceChangeHandler.bind(this);
     this._eventPriceInputHandler = this._eventPriceInputHandler.bind(this);
-    this._editClickHandler = this._editClickHandler.bind(this);
+    this._eventPriceChangeHandler = this._eventPriceChangeHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._formDeleteHandler = this._formDeleteHandler.bind(this);
-    // this._offersChangeHandler = this._offersChangeHandler.bind(this);
     this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
     this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
 
@@ -185,55 +186,42 @@ export default class EditForm extends Smart {
   }
 
   getTemplate() {
-    return generateForm(this._data, this._offers, this._destinations);
+    return generateForm(this._data, this._offers, this._destination);
   }
 
   reset(event) {
-    this.updateData(EditForm.parseEventToData(event));
+    this.updateData(NewEvent.parseEventToData(event));
   }
 
-  restoreHandlers() { // restore handlers | метод унаследован от класса Smart
+  restoreHandlers() { // restore handlers
     this._setDatepicker();
     this._setInnerHandlers();
     this.setEditDeliteClickHandler(this._callback._deleteSubmit);
     this.setEditSubmitHandler(this._callback.formSubmit);
-    this.setEditClickHandler(this._callback.editClick);
-    // this.setOffersClickHandler(this._callback.checked);
   }
 
   _eventTypeSelectHandler(evt) {
     evt.preventDefault();
     const value = evt.target.parentElement.querySelector('input').value;
 
-    this.updateData({ // здесь ошибка, модифицирует обьект точки а не обьект структуры оферса
+    this.updateData({
       type: value,
-      // offers: findOfferByType(value, this._offers), // поиск доступных офферов у точки
+      offers: findOfferByType(value, this._offers),
     });
   }
 
   _eventDestinationInputHandler(evt) {
-    if(!evt.target.value.length) {
-      evt.target.setCustomValidity('Поле не может быть пустым, введите названия города или выберите из списка.');
-      this.getElement().querySelector('.event__save-btn').disabled = true;
-    }
-    else {
-      this.getElement().querySelector('.event__save-btn').disabled = false;
-      evt.target.setCustomValidity('');
-    }
-
-    evt.target.reportValidity();
+    evt.target.value = evt.target.value.replace(/[^a-zA-Z]/, '');
   }
 
   _eventDestinationChangeHandler(evt) {
-    const selectedDestination = getDestinationByName(evt.target.value, this._destinations);
+    const selectedDestination = getDestinationByName(evt.target.value, this._destination);
 
     if(!selectedDestination) {
-      this.getElement().querySelector('.event__save-btn').disabled = true;
       evt.target.setCustomValidity('Данный город недоступен для выбора, используйте другой');
       evt.target.reportValidity();
     }
     else {
-      this.getElement().querySelector('.event__save-btn').disabled = false;
       this.updateData({
         destination: {
           description: selectedDestination.description,
@@ -242,13 +230,6 @@ export default class EditForm extends Smart {
         },
       });
     }
-
-  }
-
-  _eventPriceChangeHandler(evt) { // change input price
-    this.updateData({
-      'base_price': Number(evt.target.value),
-    }, true);
   }
 
   _eventPriceInputHandler(evt) {
@@ -257,20 +238,23 @@ export default class EditForm extends Smart {
     const price = Number(evt.target.value);
 
     if (!price || price === 0) {
-      this.getElement().querySelector('.event__save-btn').disabled = true;
       evt.target.setCustomValidity('Цена не может быть пустым полем или равна нулю.');
     }
     else {
-      this.getElement().querySelector('.event__save-btn').disabled = false;
       evt.target.setCustomValidity('');
+
+      this.updateData({
+        'base_price': price,
+      }, true);
     }
 
     evt.target.reportValidity();
   }
 
-  _editClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.editClick();
+  _eventPriceChangeHandler(evt) { // change input price
+    this.updateData({
+      'base_price': Number(evt.target.value),
+    }, true);
   }
 
   _formSubmitHandler(evt) {
@@ -288,38 +272,21 @@ export default class EditForm extends Smart {
       offers: selectedOffers,
     });
 
-    this._callback.formSubmit(EditForm.parseDataToEvent(this._data));
+    this._callback.formSubmit(NewEvent.parseDataToEvent(this._data));
   }
 
-  _formDeleteHandler(evt) {
+  _formDeleteHandler(evt) { // delete
     evt.preventDefault();
-    this._callback._deleteSubmit(EditForm.parseDataToEvent(this._data));
+    this._callback._deleteSubmit(NewEvent.parseDataToEvent(this._data));
     this._element = null;
   }
-
-  // _offersChangeHandler(evt) {
-  //   evt.preventDefault();
-
-  //   // const offer = {
-  //   //   title: evt.target.dataset.title,
-  //   //   price: Number(evt.target.dataset.price),
-  //   // };
-
-  //   // if(evt.target.checked) {
-  //   //   console.log('checked', this._checkedOffers);
-  //   //   this._checkedOffers.push(offer);
-  //   // }
-  //   // else if (!evt.target.checked) {
-  //   //   this._checkedOffers = this._checkedOffers.filter((checked) => checked.title !== offer.title);
-  //   // }
-  // }
 
   _setInnerHandlers() { // обработчики событий View
     this.getElement().querySelector('.event__type-list').addEventListener('click', this._eventTypeSelectHandler);
     this.getElement().querySelector('.event__input--destination').addEventListener('input', this._eventDestinationInputHandler);
     this.getElement().querySelector('.event__input--destination').addEventListener('change', this._eventDestinationChangeHandler);
-    this.getElement().querySelector('.event__input--price').addEventListener('change', this._eventPriceChangeHandler);
     this.getElement().querySelector('.event__input--price').addEventListener('input', this._eventPriceInputHandler);
+    this.getElement().querySelector('.event__input--price').addEventListener('change', this._eventPriceChangeHandler);
   }
 
   removeElement() {
@@ -366,11 +333,6 @@ export default class EditForm extends Smart {
     );
   }
 
-  setEditClickHandler(callback) { // button 'rollup'
-    this._callback.editClick = callback;
-    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._editClickHandler);
-  }
-
   setEditSubmitHandler(callback) { // button 'Save'
     this._callback.formSubmit = callback;
     this.getElement().querySelector('form').addEventListener('submit', this._formSubmitHandler);
@@ -380,12 +342,6 @@ export default class EditForm extends Smart {
     this._callback._deleteSubmit = callback;
     this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formDeleteHandler);
   }
-
-  // setOffersClickHandler(callback) { // offers
-  //   this._callback._checked = callback;
-  //   this.getElement().querySelector('.event__available-offers').addEventListener('change', this._offersChangeHandler);
-
-  // }
 
   _startDateChangeHandler([dateFrom]) {
     this.updateData({
@@ -403,19 +359,11 @@ export default class EditForm extends Smart {
     return Object.assign(
       {},
       event,
-      {
-        isChecked: false,
-      },
     );
   }
 
   static parseDataToEvent(data) {
-    data =  Object.assign(
-      {},
-      data,
-    );
-
-    delete data.isChecked;
+    data = Object.assign({}, data);
 
     return data;
   }

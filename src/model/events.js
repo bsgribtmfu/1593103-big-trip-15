@@ -6,15 +6,16 @@ export default class Events extends AbstractObserver {
     this._events = [];
   }
 
-  setEvents(events) {
+  setEvents(updateType, events) {
     this._events = [...events];
+    this._notify(updateType);
   }
 
   getEvents() {
     return this._events;
   }
 
-  updateEvents(updateType, update) {
+  updateEvent(updateType, update) {
     const index = this._events.findIndex((event) => event.id === update.id);
 
     if (index === -1) {
