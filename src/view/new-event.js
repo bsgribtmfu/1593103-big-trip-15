@@ -1,6 +1,5 @@
 import { humanizeEventDate } from '../utils/date.js';
-import { getLastWord } from '../utils/common.js';
-import { findOfferByType, getDestinationByName } from '../mock/data-structure.js';
+import { getLastWord, getOffersByType, getDestinationByName} from '../utils/common.js';
 import Smart from './smart.js';
 
 import flatpickr from 'flatpickr';
@@ -44,23 +43,18 @@ const generateDistanationSection = (distanation) => {
 };
 
 const generateOffers = (pointType, avalibleOffers) => {
-  const newAllOffers = findOfferByType(pointType, avalibleOffers);
+  const newAllOffers = getOffersByType(pointType, avalibleOffers);
 
-  const offersElements = newAllOffers.map((offerItem) => {
-
-    const word = getLastWord(offerItem.title);
-
-    return (
-      `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${word}-1" type="checkbox" name="event-offer-${word}">
-        <label class="event__offer-label" for="event-offer-${word}-1">
-          <span class="event__offer-title">${offerItem.title}</span>
-          &plus;&euro;&nbsp;
-          <span class="event__offer-price">${offerItem.price}</span>
-        </label>
-      </div>`
-    );
-  });
+  const offersElements = newAllOffers.map((offer, id) => (
+    `<div class="event__offer-selector">
+      <input class="event__offer-checkbox visually-hidden" data-title="${offer.title}" data-price="${offer.price}" id="event-offer-${getLastWord(offer.title)}-${id}" type="checkbox" name="event-offer-${getLastWord(offer.title)}">
+      <label class="event__offer-label" for="event-offer-${getLastWord(offer.title)}-${id}">
+        <span class="event__offer-title">${offer.title}</span>
+        &plus;&euro;&nbsp;
+        <span class="event__offer-price">${offer.price}</span>
+      </label>
+    </div>`
+  ));
 
   return offersElements.join('');
 };
@@ -77,7 +71,6 @@ const generateOffersSection = (type, avalibleOffers) => {
   return (
     `<section class="event__section  event__section--offers">
       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-
       <div class="event__available-offers">
         ${offersElements}
       </div>
@@ -97,10 +90,6 @@ const generateForm = (data, avalibleOffers, destinations) => {
   } = data;
 
   const isDisabled = !destination.name || !basePrice ? 'disabled' : '';
-
-  // console.log('isDisabled:', isDisabled);
-  // console.log('destination.name:', destination.name);
-  // console.log('basePrice', basePrice);
 
   const destinationOptions = generateDistanations(destinations);
 
@@ -206,7 +195,7 @@ export default class NewEvent extends Smart {
 
     this.updateData({
       type: value,
-      offers: findOfferByType(value, this._offers),
+      offers: getOffersByType(value, this._offers),
     });
   }
 
@@ -219,9 +208,10 @@ export default class NewEvent extends Smart {
 
     if(!selectedDestination) {
       evt.target.setCustomValidity('Данный город недоступен для выбора, используйте другой');
-      evt.target.reportValidity();
     }
     else {
+      evt.target.setCustomValidity('');
+
       this.updateData({
         destination: {
           description: selectedDestination.description,
@@ -230,6 +220,8 @@ export default class NewEvent extends Smart {
         },
       });
     }
+
+    evt.target.reportValidity();
   }
 
   _eventPriceInputHandler(evt) {
@@ -254,7 +246,7 @@ export default class NewEvent extends Smart {
   _eventPriceChangeHandler(evt) { // change input price
     this.updateData({
       'base_price': Number(evt.target.value),
-    }, true);
+    });
   }
 
   _formSubmitHandler(evt) {

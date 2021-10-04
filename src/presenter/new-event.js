@@ -12,9 +12,6 @@ export default class NewEvent {
     this._eventsListContainer = eventsListContainer;
     this._changeData = changeData;
 
-    console.log('new_event_presenter', this._offers);
-
-
     this._editFormComponent = null;
 
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
@@ -33,15 +30,15 @@ export default class NewEvent {
 
     const event = {
       'base_price': 0,
-      'date_from': dayjs(),
-      'date_to': dayjs().add(10, 'minute'),
+      'date_from': dayjs().toDate(),
+      'date_to': dayjs().add(10, 'minute').toDate(),
       destination: {
         description: '',
         name: '',
         pictures: [],
       },
       id: nanoid(),
-      isFavorite: false,
+      'is_favorite': false,
       offers: [],
       type: 'taxi',
     };

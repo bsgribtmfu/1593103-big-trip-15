@@ -50,8 +50,8 @@ export default class Trip {
 
     this._eventsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
-    // this._offersModel.addObserver(this._handleModelEvent);
-    // this._destinationsModel.addObserver(this._handleModelEvent);
+    this._offersModel.addObserver(this._handleModelEvent);
+    this._destinationsModel.addObserver(this._handleModelEvent);
 
     this._renderTrip();
   }
@@ -64,15 +64,13 @@ export default class Trip {
 
     this._eventsModel.removeObserver(this._handleModelEvent);
     this._filterModel.removeObserver(this._handleModelEvent);
-    // this._offersModel.removeObserver(this._handleModelEvent);
-    // this._destinationsModel.removeObserver(this._handleModelEvent);
+    this._offersModel.removeObserver(this._handleModelEvent);
+    this._destinationsModel.removeObserver(this._handleModelEvent);
   }
 
   createEvent() { // создание новой точки
     this._offers = this._offersModel.getOffers();
     this._destinations = this._destinationsModel.getDestinations();
-
-    console.log('createEvent', this._offers);
 
     this._currentSortType = SortType.DEFAULT;
     this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
@@ -118,7 +116,9 @@ export default class Trip {
     switch (updateType) {
       case UpdateType.PATCH:
         // обновить часть списка (например, когда поменялось описание)
-        this._eventPresenter.get(data.id).init(data);
+        this._offers = this._offersModel.getOffers();
+        this._destinations = this._destinationsModel.getDestinations();
+        this._eventPresenter.get(data.id).init(data, this._offers, this._destinations); // заколхозил
         break;
       case UpdateType.MINOR:
         // - обновить список (например, когда задача ушла в архив)
@@ -133,6 +133,7 @@ export default class Trip {
       case UpdateType.INIT:
         this._isLoading = false;
         removeElement(this._loadingComponent);
+        this._clearTrip({ resetSortType: true });
         this._renderTrip();
         break;
     }
@@ -182,8 +183,6 @@ export default class Trip {
     this._offers = this._offersModel.getOffers();
     this._destinations = this._destinationsModel.getDestinations();
 
-    console.log('_renderEvent', this._offers);
-
     const eventPresenter = new EventPresenter(this._listComponent, this._handleViewAction, this._handleModeChange);
     eventPresenter.init(event, this._offers, this._destinations);
     this._eventPresenter.set(event.id, eventPresenter);
@@ -217,6 +216,7 @@ export default class Trip {
     }
 
     const events = this._getEvents();
+
     const eventCount = events.length;
 
     if (eventCount === 0) {

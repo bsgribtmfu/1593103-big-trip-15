@@ -7,7 +7,7 @@ export default class OffersModel extends AbstractObserver {
   }
 
   setOffers(updateType, offers) {
-    this._offers = [...offers];
+    this._offers = offers;
     this._notify(updateType);
   }
 

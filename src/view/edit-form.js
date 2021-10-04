@@ -1,6 +1,5 @@
 import { humanizeEventDate } from '../utils/date.js';
-import { getLastWord } from '../utils/common.js';
-import { findOfferByType, getDestinationByName } from '../mock/data-structure.js';
+import { getLastWord, getOffersByType, getDestinationByName } from '../utils/common.js';
 
 import Smart from './smart.js';
 
@@ -47,15 +46,15 @@ const generateDistanationSection = (distanation) => {
 };
 
 // ---------- OFFERS FOR POINT ----------
-const generateOffers = (pointType, pointOffers, avalibleOffers, isChecked1) => {
+const generateOffers = (pointType, pointOffers, avalibleOffers) => {
 
-  const newAllOffers = findOfferByType(pointType, avalibleOffers); // массив офферов из доступных офферов
+  const newAllOffers = getOffersByType(pointType, avalibleOffers);
 
   const isChecked = (offer) => pointOffers.map((pointOffer) => pointOffer.title).includes(offer.title) ? 'checked' : '';
 
   const offersElements = newAllOffers.map((offer, id) => (
     `<div class="event__offer-selector">
-      <input class="event__offer-checkbox visually-hidden" data-title="${offer.title}" data-price="${offer.price}" id="event-offer-${getLastWord(offer.title)}-${id}" type="checkbox" name="event-offer-${getLastWord(offer.title)}" ${isChecked(offer)} ${isChecked1 ? 'checked' : ''}>
+      <input class="event__offer-checkbox visually-hidden" data-title="${offer.title}" data-price="${offer.price}" id="event-offer-${getLastWord(offer.title)}-${id}" type="checkbox" name="event-offer-${getLastWord(offer.title)}" ${isChecked(offer)}>
       <label class="event__offer-label" for="event-offer-${getLastWord(offer.title)}-${id}">
         <span class="event__offer-title">${offer.title}</span>
         &plus;&euro;&nbsp;
@@ -67,7 +66,8 @@ const generateOffers = (pointType, pointOffers, avalibleOffers, isChecked1) => {
   return offersElements.join('');
 };
 
-const generateOffersSection = (type, offers, avalibleOffers, isChecked) => {
+const generateOffersSection = (type, offers, avalibleOffers) => {
+
   if(!avalibleOffers.length) {
     return '';
   }
@@ -77,7 +77,7 @@ const generateOffersSection = (type, offers, avalibleOffers, isChecked) => {
       <h3 class="event__section-title event__section-title--offers">Offers</h3>
 
       <div class="event__available-offers">
-        ${generateOffers(type, offers, avalibleOffers, isChecked)}
+        ${generateOffers(type, offers, avalibleOffers)}
       </div>
     </section>`
   );
@@ -93,10 +93,13 @@ const generateForm = (data, avalibleOffers, destinations) => {
     destination,
     offers,
     type,
-    isChecked,
   } = data;
 
   const destinationOptions = generateDistanations(destinations);
+
+  const offersTest = [...avalibleOffers].find((offer) => type === offer.type);
+
+  console.log(Object.assign({}, offersTest).offers); // а теперь тот момент который я не понимаю.
 
   return (
     `<li class="trip-events__item">
@@ -150,7 +153,7 @@ const generateForm = (data, avalibleOffers, destinations) => {
           </button>
         </header>
         <section class="event__details">
-          ${generateOffersSection(type, offers, avalibleOffers, isChecked)}
+          ${generateOffersSection(type, offers, avalibleOffers)}
           ${generateDistanationSection(destination)}
         </section>
       </form>
@@ -176,7 +179,6 @@ export default class EditForm extends Smart {
     this._editClickHandler = this._editClickHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._formDeleteHandler = this._formDeleteHandler.bind(this);
-    // this._offersChangeHandler = this._offersChangeHandler.bind(this);
     this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
     this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
 
@@ -198,7 +200,6 @@ export default class EditForm extends Smart {
     this.setEditDeliteClickHandler(this._callback._deleteSubmit);
     this.setEditSubmitHandler(this._callback.formSubmit);
     this.setEditClickHandler(this._callback.editClick);
-    // this.setOffersClickHandler(this._callback.checked);
   }
 
   _eventTypeSelectHandler(evt) {
@@ -230,10 +231,12 @@ export default class EditForm extends Smart {
     if(!selectedDestination) {
       this.getElement().querySelector('.event__save-btn').disabled = true;
       evt.target.setCustomValidity('Данный город недоступен для выбора, используйте другой');
-      evt.target.reportValidity();
     }
     else {
+      evt.target.setCustomValidity('');
+
       this.getElement().querySelector('.event__save-btn').disabled = false;
+
       this.updateData({
         destination: {
           description: selectedDestination.description,
@@ -242,7 +245,7 @@ export default class EditForm extends Smart {
         },
       });
     }
-
+    evt.target.reportValidity();
   }
 
   _eventPriceChangeHandler(evt) { // change input price
@@ -296,23 +299,6 @@ export default class EditForm extends Smart {
     this._callback._deleteSubmit(EditForm.parseDataToEvent(this._data));
     this._element = null;
   }
-
-  // _offersChangeHandler(evt) {
-  //   evt.preventDefault();
-
-  //   // const offer = {
-  //   //   title: evt.target.dataset.title,
-  //   //   price: Number(evt.target.dataset.price),
-  //   // };
-
-  //   // if(evt.target.checked) {
-  //   //   console.log('checked', this._checkedOffers);
-  //   //   this._checkedOffers.push(offer);
-  //   // }
-  //   // else if (!evt.target.checked) {
-  //   //   this._checkedOffers = this._checkedOffers.filter((checked) => checked.title !== offer.title);
-  //   // }
-  // }
 
   _setInnerHandlers() { // обработчики событий View
     this.getElement().querySelector('.event__type-list').addEventListener('click', this._eventTypeSelectHandler);
@@ -381,12 +367,6 @@ export default class EditForm extends Smart {
     this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formDeleteHandler);
   }
 
-  // setOffersClickHandler(callback) { // offers
-  //   this._callback._checked = callback;
-  //   this.getElement().querySelector('.event__available-offers').addEventListener('change', this._offersChangeHandler);
-
-  // }
-
   _startDateChangeHandler([dateFrom]) {
     this.updateData({
       'date_from': dateFrom,
@@ -403,9 +383,6 @@ export default class EditForm extends Smart {
     return Object.assign(
       {},
       event,
-      {
-        isChecked: false,
-      },
     );
   }
 
@@ -414,8 +391,6 @@ export default class EditForm extends Smart {
       {},
       data,
     );
-
-    delete data.isChecked;
 
     return data;
   }

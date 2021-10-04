@@ -32,7 +32,7 @@ export default class EventPresenter {
     const prevEditFormComponent = this._editFormComponent;
 
     this._eventComponent = new Event(event);
-    this._editFormComponent = new EditForm(event, this._offers, this._destinations);
+    this._editFormComponent = new EditForm(event, offers, destinations);
 
     this._eventComponent.setEditClickHandler(this._replaceCardToForm);        // event -> form
     this._eventComponent.setFavoriteClickHandler(this._handleFavoriteClick);  // event favorite button click
@@ -40,7 +40,6 @@ export default class EventPresenter {
     this._editFormComponent.setEditClickHandler(this._handleEditClickRollup); // form -> event  | rollup
     this._editFormComponent.setEditSubmitHandler(this._handleEditSubmit);     // save | submit
     this._editFormComponent.setEditDeliteClickHandler(this._deleteEditForm);  // form -> event  | remove
-    // this._editFormComponent.setOffersClickHandler(this._offersChangeHandler); // offers click handlers
 
     if (prevEventComponent === null || prevEditFormComponent === null) {
       render(this._eventsListContainer, this._eventComponent, RenderPosition.BEFOREEND);

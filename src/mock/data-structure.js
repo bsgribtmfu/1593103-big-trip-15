@@ -16,8 +16,6 @@ const generateDistanations = () => CITIES.map((city) => Object.assign({}, genera
 
 const destinations = generateDistanations();
 
-const getDestinationByName = (cityValue, dest) => dest.find((city) => cityValue === city.name);
-
 const generateEvent = () => {
   const newDate = generateFromToDate();
 
@@ -48,9 +46,4 @@ const getOffersStructure = () => {
 
 const offersMock = getOffersStructure();
 
-const findOfferByType = (typeValue, offers) => {
-  const foundOffer = offers.find((offer) => typeValue === offer.type);
-  return foundOffer.offers;
-};
-
-export { generateEvent, offersMock, findOfferByType, getDestinationByName, destinations };
+export { generateEvent, offersMock, destinations };
