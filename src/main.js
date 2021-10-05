@@ -25,7 +25,7 @@ const filtersContainer = document.querySelector('.trip-controls__filters');
 const tripEventsElement = document.querySelector('.trip-events');
 const addButton = document.querySelector('.trip-main__event-add-btn');
 
-const AUTHORIZATION = 'Basic nkdj3idsfr3f03dK';
+const AUTHORIZATION = 'Basic nkdj3ipsfr3f03dK';
 const END_POINT = 'https://15.ecmascript.pages.academy/big-trip';
 
 const api = new Api(END_POINT, AUTHORIZATION);

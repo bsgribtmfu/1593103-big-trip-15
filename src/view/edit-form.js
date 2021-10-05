@@ -46,13 +46,13 @@ const generateDistanationSection = (distanation) => {
 };
 
 // ---------- OFFERS FOR POINT ----------
-const generateOffers = (pointType, pointOffers, avalibleOffers) => {
+const generateOffers = (type, pointOffers, avalibleOffers) => {
 
-  const newAllOffers = getOffersByType(pointType, avalibleOffers);
+  const offersByType = getOffersByType(type, avalibleOffers);
 
   const isChecked = (offer) => pointOffers.map((pointOffer) => pointOffer.title).includes(offer.title) ? 'checked' : '';
 
-  const offersElements = newAllOffers.map((offer, id) => (
+  const offersElements = offersByType.map((offer, id) => (
     `<div class="event__offer-selector">
       <input class="event__offer-checkbox visually-hidden" data-title="${offer.title}" data-price="${offer.price}" id="event-offer-${getLastWord(offer.title)}-${id}" type="checkbox" name="event-offer-${getLastWord(offer.title)}" ${isChecked(offer)}>
       <label class="event__offer-label" for="event-offer-${getLastWord(offer.title)}-${id}">
@@ -68,6 +68,8 @@ const generateOffers = (pointType, pointOffers, avalibleOffers) => {
 
 const generateOffersSection = (type, offers, avalibleOffers) => {
 
+  // console.log(avalibleOffers);
+
   if(!avalibleOffers.length) {
     return '';
   }
@@ -75,7 +77,6 @@ const generateOffersSection = (type, offers, avalibleOffers) => {
   return (
     `<section class="event__section event__section--offers">
       <h3 class="event__section-title event__section-title--offers">Offers</h3>
-
       <div class="event__available-offers">
         ${generateOffers(type, offers, avalibleOffers)}
       </div>
@@ -97,9 +98,8 @@ const generateForm = (data, avalibleOffers, destinations) => {
 
   const destinationOptions = generateDistanations(destinations);
 
-  const offersTest = [...avalibleOffers].find((offer) => type === offer.type);
-
-  console.log(Object.assign({}, offersTest).offers); // а теперь тот момент который я не понимаю.
+  // const avalibleOffersByType = getOffersByType(type, avalibleOffers);
+  console.log(avalibleOffers, type);
 
   return (
     `<li class="trip-events__item">
