@@ -29,14 +29,14 @@ const humanizeEventDurationDate = (date) => {
   return resultDateDiff;
 };
 
-export const msToTime = (duration) => {
-  const milliseconds = parseInt((duration % 1000) / 100);
-  const seconds = Math.floor((duration / 1000) % 60);
-  const minutes = Math.floor((duration / (1000 * 60)) % 60);
-  const hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
-  const years = Math.floor(duration / (1000 * 60 * 60 * 24 * 30 * 12));
-  const months = Math.floor(duration / (1000 * 60 * 60 * 24 * 30) % 12);
-  const days = Math.floor(duration / (1000 * 60 * 60 * 24) % 30);
+const msToTime = (durationTime) => {
+  const milliseconds = Math.floor((durationTime % 1000) / 100);
+  const seconds = Math.floor((durationTime / 1000) % 60);
+  const minutes = Math.floor((durationTime / (1000 * 60)) % 60);
+  const hours = Math.floor((durationTime / (1000 * 60 * 60)) % 24);
+  const years = Math.floor(durationTime / (1000 * 60 * 60 * 24 * 30 * 12));
+  const months = Math.floor(durationTime / (1000 * 60 * 60 * 24 * 30) % 12);
+  const days = Math.floor(durationTime / (1000 * 60 * 60 * 24) % 30);
 
   return ({
     years,
@@ -56,5 +56,6 @@ export {
   humanizeEventDate,
   getDiffDuration,
   getDiff,
-  humanizeEventDurationDate
+  humanizeEventDurationDate,
+  msToTime
 };

@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid';
 import { removeElement, render, RenderPosition } from '../utils/render.js';
-import { UserAction, UpdateType } from '../mock/constans.js';
+import { UserAction, UpdateType } from '../constans.js';
 
 import dayjs from 'dayjs';
 
@@ -63,7 +63,7 @@ export default class NewEvent {
     document.removeEventListener('keydown', this._escKeyDownHandler);
   }
 
-  _handleEditSubmit(event) { // button save
+  _handleEditSubmit(event) {
     this._changeData(
       UserAction.ADD_EVENT,
       UpdateType.MINOR,
@@ -83,5 +83,24 @@ export default class NewEvent {
     }
 
     document.querySelector('.trip-main__event-add-btn').disabled = false;
+  }
+
+  setSaving() {
+    this._editFormComponent.updateData({
+      isDisabled: true,
+      isSaving: true,
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this._editFormComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this._editFormComponent.shake(resetFormState);
   }
 }

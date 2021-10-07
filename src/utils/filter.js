@@ -1,4 +1,4 @@
-import { FilterType } from '../mock/constans.js';
+import { FilterType } from '../constans.js';
 
 import dayjs from 'dayjs';
 

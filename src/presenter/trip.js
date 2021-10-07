@@ -1,4 +1,4 @@
-import { SortType, UpdateType, UserAction, FilterType } from '../mock/constans.js';
+import { SortType, UpdateType, UserAction, FilterType, State } from '../constans.js';
 import { render, RenderPosition, removeElement } from '../utils/render.js';
 import { sortByPrice } from '../utils/common.js';
 import { sortByDate, getDiffDuration } from '../utils/date.js';
@@ -95,19 +95,31 @@ export default class Trip {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_EVENT:
+        this._eventPresenter.get(update.id).setViewState(State.SAVING);
         this._api.updateEvent(update).then((response) => {
           this._eventsModel.updateEvent(updateType, response);
-        });
+        })
+          .catch(() => {
+            this._eventPresenter.get(update.id).setViewState(State.ABORTING);
+          });
         break;
       case UserAction.ADD_EVENT:
+        this._newEventPresenter.setSaving();
         this._api.addEvent(update).then((response) => {
           this._eventsModel.addEvent(updateType, response);
-        });
+        })
+          .catch(() => {
+            this._newEventPresenter.setAborting();
+          });
         break;
       case UserAction.DELETE_EVENT:
+        this._eventPresenter.get(update.id).setViewState(State.DELETING);
         this._api.deleteEvent(update).then(() => {
           this._eventsModel.deleteEvent(updateType, update);
-        });
+        })
+          .catch(() => {
+            this._eventPresenter.get(update.id).setViewState(State.ABORTING);
+          });
         break;
     }
   }

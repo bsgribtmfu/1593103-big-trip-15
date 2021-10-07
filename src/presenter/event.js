@@ -1,5 +1,5 @@
 import { render, RenderPosition, replaceElement, removeElement } from '../utils/render.js';
-import { UserAction, UpdateType, Mode } from '../mock/constans.js';
+import { UserAction, UpdateType, Mode, State } from '../constans.js';
 
 import Event from '../view/event.js';
 import EditForm from '../view/edit-form.js';
@@ -52,6 +52,7 @@ export default class EventPresenter {
 
     if (this._mode === Mode.EDITING) {
       replaceElement(this._editFormComponent, prevEditFormComponent);
+      this._mode = Mode.DEFAULT;
     }
 
     removeElement(prevEventComponent);
@@ -76,7 +77,7 @@ export default class EventPresenter {
       event,
     );
 
-    removeElement(this._editFormComponent); // this._element = null AND remove element from DOM
+    // removeElement(this._editFormComponent); // this._element = null AND remove element from DOM
   }
 
   _escKeyDownHandler(evt) {
@@ -100,6 +101,39 @@ export default class EventPresenter {
     this._mode = Mode.DEFAULT;
   }
 
+  setViewState(state) {
+    if (this._mode === Mode.DEFAULT) {
+      return;
+    }
+
+    const resetFormState = () => {
+      this._editFormComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    switch (state) {
+      case State.SAVING:
+        this._editFormComponent.updateData({
+          isDisabled: true,
+          isSaving: true,
+        });
+        break;
+      case State.DELETING:
+        this._editFormComponent.updateData({
+          isDisabled: true,
+          isDeleting: true,
+        });
+        break;
+      case State.ABORTING:
+        this._eventComponent.shake(resetFormState);
+        this._editFormComponent.shake(resetFormState);
+        break;
+    }
+  }
+
   _handleEditClickRollup() {
     this._editFormComponent.reset(this._event);
     this._replaceFormToCard();
@@ -112,7 +146,7 @@ export default class EventPresenter {
       event,
     );
 
-    this._replaceFormToCard();
+    // this._replaceFormToCard();
   }
 
   _handleFavoriteClick() {

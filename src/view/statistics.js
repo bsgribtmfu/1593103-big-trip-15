@@ -1,9 +1,8 @@
-import dayjs from 'dayjs';
-import flatpickr from 'flatpickr';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
-import { humanizeEventDate, getDuration, humanizeEventDurationDate, getDiff, msToTime } from '../utils/date.js';
+import { STATS_BAR_HEIGHT } from '../mock/constans.js';
+import { humanizeEventDurationDate, getDiff, msToTime } from '../utils/date.js';
 
 import Smart from '../view/smart.js';
 
@@ -276,10 +275,9 @@ export default class Statistics extends Smart {
     const typeCtx = this.getElement().querySelector('#type');
     const timeCtx = this.getElement().querySelector('#time-spend');
 
-    const BAR_HEIGHT = 55;
-    moneyCtx.height = BAR_HEIGHT * 5;
-    typeCtx.height = BAR_HEIGHT * 5;
-    timeCtx.height = BAR_HEIGHT * 5;
+    moneyCtx.height = STATS_BAR_HEIGHT * 5;
+    typeCtx.height = STATS_BAR_HEIGHT * 5;
+    timeCtx.height = STATS_BAR_HEIGHT * 5;
 
     this._renderMoneyChart = renderMoneyChart(moneyCtx, this._events);
     this._renderTypeChart = renderTypeChart(typeCtx, this._events);

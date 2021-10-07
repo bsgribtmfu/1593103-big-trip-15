@@ -1,5 +1,5 @@
 import AbstractObserver from '../utils/abstract-observer.js';
-import { FilterType } from '../mock/constans.js';
+import { FilterType } from '../constans.js';
 
 export default class Filter extends AbstractObserver {
   constructor() {

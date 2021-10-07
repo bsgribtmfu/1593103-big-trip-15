@@ -1,5 +1,5 @@
 import Abstract from './abstract.js';
-import { NavigationItem } from '../mock/constans.js';
+import { NavigationItem } from '../constans.js';
 
 const generateNavigation = () => (
   `<nav class="trip-controls__trip-tabs trip-tabs">

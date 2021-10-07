@@ -29,6 +29,7 @@ const generateDestinationPhotos = (pictures) => {
 };
 
 const generateDistanationSection = (distanation) => {
+
   if(!distanation.description || !distanation.pictures) {
     return '';
   }
@@ -42,10 +43,9 @@ const generateDistanationSection = (distanation) => {
   );
 };
 
-const generateOffers = (pointType, avalibleOffers) => {
-  const newAllOffers = getOffersByType(pointType, avalibleOffers);
+const generateOffers = (avalibleOffers) => {
 
-  const offersElements = newAllOffers.map((offer, id) => (
+  const offersElements = avalibleOffers.map((offer, id) => (
     `<div class="event__offer-selector">
       <input class="event__offer-checkbox visually-hidden" data-title="${offer.title}" data-price="${offer.price}" id="event-offer-${getLastWord(offer.title)}-${id}" type="checkbox" name="event-offer-${getLastWord(offer.title)}">
       <label class="event__offer-label" for="event-offer-${getLastWord(offer.title)}-${id}">
@@ -59,12 +59,12 @@ const generateOffers = (pointType, avalibleOffers) => {
   return offersElements.join('');
 };
 
-const generateOffersSection = (type, avalibleOffers) => {
+const generateOffersSection = (avalibleOffersByType) => {
 
-  const offersElements = generateOffers(type, avalibleOffers);
+  const offersElements = generateOffers(avalibleOffersByType);
 
 
-  if(!avalibleOffers.length) {
+  if(!avalibleOffersByType.length) {
     return '';
   }
 
@@ -87,11 +87,15 @@ const generateForm = (data, avalibleOffers, destinations) => {
     'date_to': dateTo,
     destination,
     type,
+    isDisabled,
+    isSaving,
+    isDeleting,
   } = data;
 
-  const isDisabled = !destination.name || !basePrice ? 'disabled' : '';
+  // const isDisabled = !destination.name || !basePrice ? 'disabled' : '';
 
   const destinationOptions = generateDistanations(destinations);
+  const avalibleOffersByType = avalibleOffers.length ? getOffersByType(type, avalibleOffers) : [];
 
   return (
     `<li class="trip-events__item">
@@ -102,7 +106,7 @@ const generateForm = (data, avalibleOffers, destinations) => {
               <span class="visually-hidden">Choose event type</span>
               <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
             </label>
-            <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+            <input class="event__type-toggle visually-hidden" id="event-type-toggle-1" type="checkbox" ${isDisabled ? 'disabled' : ''}>
 
             <div class="event__type-list">
               <fieldset class="event__type-group">
@@ -116,7 +120,7 @@ const generateForm = (data, avalibleOffers, destinations) => {
             <label class="event__label  event__type-output" for="event-destination-1">
               ${type}
             </label>
-            <input class="event__input event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
+            <input class="event__input event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1" ${isDisabled ? 'disabled' : ''}>
             <datalist id="destination-list-1">
               ${destinationOptions}
             </datalist>
@@ -124,10 +128,10 @@ const generateForm = (data, avalibleOffers, destinations) => {
 
           <div class="event__field-group  event__field-group--time">
             <label class="visually-hidden" for="event-start-time-1">From</label>
-            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizeEventDate(dateFrom, 'DD/MM/YY')} ${humanizeEventDate(dateFrom, 'HH:mm')}">
+            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizeEventDate(dateFrom, 'DD/MM/YY')} ${humanizeEventDate(dateFrom, 'HH:mm')}" ${isDisabled ? 'disabled' : ''}>
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">To</label>
-            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizeEventDate(dateTo, 'DD/MM/YY')} ${humanizeEventDate(dateTo, 'HH:mm')}">
+            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizeEventDate(dateTo, 'DD/MM/YY')} ${humanizeEventDate(dateTo, 'HH:mm')}" ${isDisabled ? 'disabled' : ''}>
           </div>
 
           <div class="event__field-group  event__field-group--price">
@@ -135,15 +139,15 @@ const generateForm = (data, avalibleOffers, destinations) => {
               <span class="visually-hidden">${basePrice}</span>
               &euro;
             </label>
-            <input class="event__input event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
+            <input class="event__input event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}" ${isDisabled ? 'disabled' : ''}>
           </div>
 
-          <button class="event__save-btn btn btn--blue" type="submit" ${isDisabled}>Save</button>
-          <button class="event__reset-btn" type="reset">Cancel</button>
+          <button class="event__save-btn btn btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
+          <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>${isDeleting ? 'Deleting...' : 'Delete'}</button>
         </header>
         <section class="event__details">
-          ${generateOffersSection(type, avalibleOffers)}
-          ${generateDistanationSection(destinations)}
+          ${generateOffersSection(avalibleOffersByType)}
+          ${generateDistanationSection(destination)}
         </section>
       </form>
     </li>`
@@ -200,7 +204,7 @@ export default class NewEvent extends Smart {
   }
 
   _eventDestinationInputHandler(evt) {
-    evt.target.value = evt.target.value.replace(/[^a-zA-Z]/, '');
+    evt.target.value = evt.target.value.replace(/[^a-zA-Z\s]/, '');
   }
 
   _eventDestinationChangeHandler(evt) {
@@ -351,11 +355,20 @@ export default class NewEvent extends Smart {
     return Object.assign(
       {},
       event,
+      {
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      },
     );
   }
 
   static parseDataToEvent(data) {
     data = Object.assign({}, data);
+
+    delete data.isDisabled;
+    delete data.isSaving;
+    delete data.isDeleting;
 
     return data;
   }

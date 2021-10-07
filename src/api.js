@@ -1,4 +1,4 @@
-import { Method, SuccessHTTPStatusRange } from './mock/constans.js';
+import { Method, SuccessHTTPStatusRange } from './constans.js';
 
 export default class Api {
   constructor(endPoint, authorization) {
