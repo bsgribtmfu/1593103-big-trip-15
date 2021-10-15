@@ -18,7 +18,7 @@ const getFirstLetter = (key) => key.charAt(0).toUpperCase();
 
 const sortByPrice = (a, b) => b.base_price - a.base_price;
 
-const getElementsByType = (type, elements, keyName) => [...elements].find((element) => type === element[`${keyName}`]);
+const getElementsByType = (type, elements, keyName) => elements.find((element) => type === element[`${keyName}`]);
 
 
 export {
