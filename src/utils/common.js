@@ -18,8 +18,14 @@ const getFirstLetter = (key) => key.charAt(0).toUpperCase();
 
 const sortByPrice = (a, b) => b.base_price - a.base_price;
 
-const getOffersByType = (typeValue, offers) => [...offers].find((offer) => typeValue === offer.type).offers;
+const getElementsByType = (type, elements, keyName) => [...elements].find((element) => type === element[`${keyName}`]);
 
-const getDestinationByName = (cityValue, dest) => [...dest].find((city) => cityValue === city.name);
 
-export { getRandomIntInclusive, genRandomItemFrom, getLastWord, sortByPrice, getFirstLetter, getOffersByType, getDestinationByName };
+export {
+  getRandomIntInclusive,
+  genRandomItemFrom,
+  getLastWord,
+  sortByPrice,
+  getFirstLetter,
+  getElementsByType
+};

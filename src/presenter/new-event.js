@@ -1,8 +1,8 @@
+import dayjs from 'dayjs';
+
 import { nanoid } from 'nanoid';
 import { removeElement, render, RenderPosition } from '../utils/render.js';
 import { UserAction, UpdateType } from '../constans.js';
-
-import dayjs from 'dayjs';
 
 import NewEventView from '../view/new-event.js';
 
@@ -15,8 +15,10 @@ export default class NewEvent {
     this._editFormComponent = null;
 
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
-    this._handleEditSubmit = this._handleEditSubmit.bind(this);   // save | submit
-    this._deleteEditForm = this._deleteEditForm.bind(this);       // form -> event  | remove
+    this._handleEditSubmit = this._handleEditSubmit.bind(this);
+    this._deleteEditForm = this._deleteEditForm.bind(this);
+
+    this._addButton = document.querySelector('.trip-main__event-add-btn');
   }
 
 
@@ -45,8 +47,8 @@ export default class NewEvent {
 
     this._editFormComponent = new NewEventView(event, this._offers, this._destination);
 
-    this._editFormComponent.setEditSubmitHandler(this._handleEditSubmit);     // save | submit
-    this._editFormComponent.setEditDeliteClickHandler(this._deleteEditForm);  // form -> event  | remove
+    this._editFormComponent.setEditSubmitHandler(this._handleEditSubmit);
+    this._editFormComponent.setEditDeliteClickHandler(this._deleteEditForm);
 
     render(this._eventsListContainer, this._editFormComponent, RenderPosition.AFTERBEGIN);
     document.addEventListener('keydown', this._escKeyDownHandler);
@@ -73,16 +75,15 @@ export default class NewEvent {
 
   _deleteEditForm() {
     this.destroy();
-    document.querySelector('.trip-main__event-add-btn').disabled = false;
+    this._addButton.disabled = false;
   }
 
   _escKeyDownHandler(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
+      this._addButton.disabled = false;
       this.destroy();
     }
-
-    document.querySelector('.trip-main__event-add-btn').disabled = false;
   }
 
   setSaving() {

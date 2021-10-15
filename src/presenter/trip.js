@@ -27,7 +27,7 @@ export default class Trip {
     this._filterType = FilterType.EVERYTHING;
     this._currentSortType = SortType.DEFAULT;
 
-    this._eventPresenter = new Map(); // events
+    this._eventPresenter = new Map();
 
     this._listComponent = new EventsList();
     this._loadingComponent = new LoadingView();
@@ -42,7 +42,7 @@ export default class Trip {
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
 
     this._newEventPresenter = new NewEventPresenter(this._listComponent, this._handleViewAction);
-    // this._addButton = document.querySelector('.trip-main__event-add-btn');
+    this._addButton = document.querySelector('.trip-main__event-add-btn');
   }
 
   init() {
@@ -68,7 +68,7 @@ export default class Trip {
     this._destinationsModel.removeObserver(this._handleModelEvent);
   }
 
-  createEvent() { // создание новой точки
+  createEvent() {
     this._offers = this._offersModel.getOffers();
     this._destinations = this._destinationsModel.getDestinations();
 
@@ -77,7 +77,7 @@ export default class Trip {
     this._newEventPresenter.init(this._offers, this._destinations);
   }
 
-  _getEvents() { // получаем все точки
+  _getEvents() {
     this._filterType = this._filterModel.getFilter();
     const events = this._eventsModel.getEvents();
     const filtredEvents = filter[this._filterType](events);
@@ -127,18 +127,15 @@ export default class Trip {
   _handleModelEvent(updateType, data) {
     switch (updateType) {
       case UpdateType.PATCH:
-        // обновить часть списка (например, когда поменялось описание)
         this._offers = this._offersModel.getOffers();
         this._destinations = this._destinationsModel.getDestinations();
-        this._eventPresenter.get(data.id).init(data, this._offers, this._destinations); // заколхозил
+        this._eventPresenter.get(data.id).init(data, this._offers, this._destinations);
         break;
       case UpdateType.MINOR:
-        // - обновить список (например, когда задача ушла в архив)
         this._clearTrip();
         this._renderTrip();
         break;
       case UpdateType.MAJOR:
-        // - обновить всю доску (например, при переключении фильтра)
         this._clearTrip({ resetSortType: true });
         this._renderTrip();
         break;
@@ -158,7 +155,7 @@ export default class Trip {
 
     this._currentSortType = sortType;
     this._clearEventList();
-    this._renderEvents(this._getEvents()); // здесь была ошибка, правильно ли так???? уточнить
+    this._renderEvents(this._getEvents());
   }
 
   _handleModeChange() {
@@ -185,7 +182,7 @@ export default class Trip {
       this._sortComponent = null;
     }
 
-    this._sortComponent = new Sort(this._currentSortType); // не принимаю в классе Sort???
+    this._sortComponent = new Sort(this._currentSortType);
     this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
 
     render(this._mainContainer, this._sortComponent, RenderPosition.AFTERBEGIN);
@@ -219,6 +216,8 @@ export default class Trip {
     if (resetSortType) {
       this._currentSortType = SortType.DEFAULT;
     }
+
+    this._addButton.disabled = false;
   }
 
   _renderTrip() {

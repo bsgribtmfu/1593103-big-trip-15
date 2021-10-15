@@ -30,7 +30,7 @@ export default class Filter {
       return;
     }
 
-    replaceElement(this._filterComponent, prevFilterComponent); // надо ли делать replace? данные ведь никак не меняются в фильтрах, а следовательно, что там перерисовывать?
+    replaceElement(this._filterComponent, prevFilterComponent);
     removeElement(prevFilterComponent);
   }
 

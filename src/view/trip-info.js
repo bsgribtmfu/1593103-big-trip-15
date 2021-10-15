@@ -6,7 +6,7 @@ const findEvents = (events) => {
   const middleDestination = events[events.length / 2 | 0].destination.name;
   const endDestination = events[events.length - 1].destination.name;
 
-  switch(true) { // переделать [ диспетчеризация по обьекту ]
+  switch(true) {
     case(events.length === 1):
       return startDestination;
     case(events.length === 2):
@@ -30,7 +30,6 @@ const generatetripInfo = (events) => {
         <h1 class="trip-info__title">${findEvents(sortedEventsByDates)}</h1>
         <p class="trip-info__dates">${rangeDates}</p>
       </div>
-
       <p class="trip-info__cost">
         Total: &euro;&nbsp;<span class="trip-info__cost-value">${totalTripCost}</span>
       </p>

@@ -1,5 +1,10 @@
 const STATS_BAR_HEIGHT = 55;
 
+const ObjectKeyName = {
+  TYPE: 'type',
+  NAME: 'name',
+};
+
 const SortType = {
   DEFAULT: 'DEFAULT',
   TRIP_TIME: 'TRIP_TIME',
@@ -61,6 +66,7 @@ const NoEventsTextType = {
 
 export {
   STATS_BAR_HEIGHT,
+  ObjectKeyName,
   SortType,
   UserAction,
   UpdateType,

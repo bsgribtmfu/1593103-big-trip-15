@@ -1,8 +1,10 @@
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
 
-import { STATS_BAR_HEIGHT } from '../mock/constans.js';
-import { humanizeEventDurationDate, getDiff, msToTime } from '../utils/date.js';
+import { STATS_BAR_HEIGHT } from '../constans.js';
+import { humanizeEventDurationDate, getDiff } from '../utils/date.js';
 
 import Smart from '../view/smart.js';
 
@@ -162,6 +164,8 @@ const renderTypeChart = (typeCtx, events) => {
 const renderTimeChart = (timeCtx, events) => {
   const result = events.reduce((a,c) => (a[c.type] = (a[c.type] || 0) + getDiff(c.date_from, c.date_to), a), {});
 
+  dayjs.extend(duration);
+
   const types = Object.keys(result).map((e) => e.toUpperCase());
   const times = Object.values(result);
 
@@ -186,8 +190,8 @@ const renderTimeChart = (timeCtx, events) => {
           color: '#000000',
           anchor: 'end',
           align: 'start',
-          formatter: function(value, context) {
-            return humanizeEventDurationDate(msToTime(context.chart.data.datasets[0].data[context.dataIndex]));
+          formatter: function(_, context) {
+            return humanizeEventDurationDate(dayjs.duration(context.chart.data.datasets[0].data[context.dataIndex]).$d);
           },
         },
       },

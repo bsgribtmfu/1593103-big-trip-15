@@ -1,10 +1,12 @@
-import { humanizeEventDate } from '../utils/date.js';
-import { getLastWord, getOffersByType, getDestinationByName} from '../utils/common.js';
-import Smart from './smart.js';
-
+import dayjs from 'dayjs';
 import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
 
-import '../../node_modules/flatpickr/dist/flatpickr.min.css';
+import { ObjectKeyName } from '../constans.js';
+import { humanizeEventDate } from '../utils/date.js';
+import { getLastWord, getElementsByType } from '../utils/common.js';
+
+import Smart from './smart.js';
 
 const typeItemTemplate = (type, currentType, id) => (
   `<div class="event__type-item">
@@ -89,13 +91,13 @@ const generateForm = (data, avalibleOffers, destinations) => {
     type,
     isDisabled,
     isSaving,
-    isDeleting,
+    isCanceling,
   } = data;
 
-  // const isDisabled = !destination.name || !basePrice ? 'disabled' : '';
+  const isDisabledButton = !destination.name || !basePrice ? 'disabled' : '';
 
   const destinationOptions = generateDistanations(destinations);
-  const avalibleOffersByType = avalibleOffers.length ? getOffersByType(type, avalibleOffers) : [];
+  const avalibleOffersByType = avalibleOffers.length ? getElementsByType(type, avalibleOffers, ObjectKeyName.TYPE).offers : [];
 
   return (
     `<li class="trip-events__item">
@@ -128,10 +130,10 @@ const generateForm = (data, avalibleOffers, destinations) => {
 
           <div class="event__field-group  event__field-group--time">
             <label class="visually-hidden" for="event-start-time-1">From</label>
-            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizeEventDate(dateFrom, 'DD/MM/YY')} ${humanizeEventDate(dateFrom, 'HH:mm')}" ${isDisabled ? 'disabled' : ''}>
+            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" data-time="${dateFrom.toISOString()}" value="${humanizeEventDate(dateFrom, 'DD/MM/YY HH:mm')}" ${isDisabled ? 'disabled' : ''}>
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">To</label>
-            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizeEventDate(dateTo, 'DD/MM/YY')} ${humanizeEventDate(dateTo, 'HH:mm')}" ${isDisabled ? 'disabled' : ''}>
+            <input class="event__input event__input--time" id="event-end-time-1" type="text" name="event-end-time" data-time="${dateTo.toISOString()}" value="${humanizeEventDate(dateTo, 'DD/MM/YY HH:mm')}" ${isDisabled ? 'disabled' : ''}>
           </div>
 
           <div class="event__field-group  event__field-group--price">
@@ -142,8 +144,8 @@ const generateForm = (data, avalibleOffers, destinations) => {
             <input class="event__input event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}" ${isDisabled ? 'disabled' : ''}>
           </div>
 
-          <button class="event__save-btn btn btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
-          <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>${isDeleting ? 'Deleting...' : 'Delete'}</button>
+          <button class="event__save-btn btn btn--blue" type="submit" ${isDisabledButton}>${isSaving ? 'Saving...' : 'Save'}</button>
+          <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>${isCanceling ? 'Canceling...' : 'Cancel'}</button>
         </header>
         <section class="event__details">
           ${generateOffersSection(avalibleOffersByType)}
@@ -186,7 +188,7 @@ export default class NewEvent extends Smart {
     this.updateData(NewEvent.parseEventToData(event));
   }
 
-  restoreHandlers() { // restore handlers
+  restoreHandlers() {
     this._setDatepicker();
     this._setInnerHandlers();
     this.setEditDeliteClickHandler(this._callback._deleteSubmit);
@@ -199,7 +201,7 @@ export default class NewEvent extends Smart {
 
     this.updateData({
       type: value,
-      offers: getOffersByType(value, this._offers),
+      offers: getElementsByType(value, this._offers, ObjectKeyName.TYPE).offers,
     });
   }
 
@@ -208,7 +210,7 @@ export default class NewEvent extends Smart {
   }
 
   _eventDestinationChangeHandler(evt) {
-    const selectedDestination = getDestinationByName(evt.target.value, this._destination);
+    const selectedDestination = getElementsByType(evt.target.value, this._destination, ObjectKeyName.NAME);
 
     if(!selectedDestination) {
       evt.target.setCustomValidity('Данный город недоступен для выбора, используйте другой');
@@ -247,7 +249,7 @@ export default class NewEvent extends Smart {
     evt.target.reportValidity();
   }
 
-  _eventPriceChangeHandler(evt) { // change input price
+  _eventPriceChangeHandler(evt) {
     this.updateData({
       'base_price': Number(evt.target.value),
     });
@@ -271,13 +273,13 @@ export default class NewEvent extends Smart {
     this._callback.formSubmit(NewEvent.parseDataToEvent(this._data));
   }
 
-  _formDeleteHandler(evt) { // delete
+  _formDeleteHandler(evt) {
     evt.preventDefault();
     this._callback._deleteSubmit(NewEvent.parseDataToEvent(this._data));
     this._element = null;
   }
 
-  _setInnerHandlers() { // обработчики событий View
+  _setInnerHandlers() {
     this.getElement().querySelector('.event__type-list').addEventListener('click', this._eventTypeSelectHandler);
     this.getElement().querySelector('.event__input--destination').addEventListener('input', this._eventDestinationInputHandler);
     this.getElement().querySelector('.event__input--destination').addEventListener('change', this._eventDestinationChangeHandler);
@@ -304,13 +306,13 @@ export default class NewEvent extends Smart {
 
   _setDatepicker() {
     this._clearDatepicker();
+
     this._datepickerStart = flatpickr(
       this.getElement().querySelector('#event-start-time-1'),
       {
         dateFormat: 'd/m/y H:i',
         enableTime: true,
         'time_24hr': true,
-        maxDate: this._data.date_to,
         defaultDate: this._data.date_from,
         onChange: this._startDateChangeHandler,
       },
@@ -329,20 +331,34 @@ export default class NewEvent extends Smart {
     );
   }
 
-  setEditSubmitHandler(callback) { // button 'Save'
+  setEditSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.getElement().querySelector('form').addEventListener('submit', this._formSubmitHandler);
   }
 
-  setEditDeliteClickHandler(callback) { // button 'Delete'
+  setEditDeliteClickHandler(callback) {
     this._callback._deleteSubmit = callback;
     this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formDeleteHandler);
   }
 
   _startDateChangeHandler([dateFrom]) {
-    this.updateData({
-      'date_from': dateFrom,
-    });
+    const datatime = this.getElement().querySelector('#event-end-time-1').dataset.time;
+    const dateTo = dayjs(dayjs(datatime)).toDate();
+
+    if(dateFrom > dateTo) {
+      const newDateTo = dayjs(dateFrom).add(10, 'minute').toDate();
+      this._datepickerEnd.config.minDate = newDateTo;
+      this._datepickerEnd.config.defaultDate = newDateTo;
+
+      this.updateData({
+        'date_from': dateFrom,
+        'date_to': newDateTo,
+      });
+    } else {
+      this.updateData({
+        'date_from': dateFrom,
+      });
+    }
   }
 
   _endDateChangeHandler([dateTo]) {
@@ -358,7 +374,7 @@ export default class NewEvent extends Smart {
       {
         isDisabled: false,
         isSaving: false,
-        isDeleting: false,
+        isCanceling: false,
       },
     );
   }
@@ -368,7 +384,7 @@ export default class NewEvent extends Smart {
 
     delete data.isDisabled;
     delete data.isSaving;
-    delete data.isDeleting;
+    delete data.isCanceling;
 
     return data;
   }

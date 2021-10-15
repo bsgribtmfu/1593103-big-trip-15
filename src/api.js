@@ -56,7 +56,7 @@ export default class Api {
   }) {
     headers.append('Authorization', this._authorization);
 
-    return fetch( // вернет промис
+    return fetch(
       `${this._endPoint}/${url}`,
       {method, body, headers},
     )

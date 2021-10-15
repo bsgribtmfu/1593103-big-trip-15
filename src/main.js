@@ -3,19 +3,16 @@ import { NavigationItem, UpdateType } from './constans.js';
 
 import Api from './api.js';
 
-// PRESENTER
 import TripPresenter from './presenter/trip.js';
 import Statistics from './view/statistics.js';
 import FiltersPresenter from './presenter/filter.js';
 import TripInfoPresenter from './presenter/trip-info.js';
 
-// MODEL
 import EventsModel from './model/events.js';
 import FilterModel from './model/filter.js';
 import OffersModel from './model/offers.js';
 import DestinationsModel from './model/destination.js';
 
-// VIEW
 import TripInfoModel from './view/trip-info.js';
 import Navigation from './view/navigation.js';
 
@@ -25,27 +22,25 @@ const filtersContainer = document.querySelector('.trip-controls__filters');
 const tripEventsElement = document.querySelector('.trip-events');
 const addButton = document.querySelector('.trip-main__event-add-btn');
 
-const AUTHORIZATION = 'Basic nkdj3Ppsfrpf03dK';
+const AUTHORIZATION = 'Basic nkdp3Ppsfppf03dK';
 const END_POINT = 'https://15.ecmascript.pages.academy/big-trip';
 
 const api = new Api(END_POINT, AUTHORIZATION);
 
-// CREATE MODEL
 const eventsModel = new EventsModel();
 const filterModel = new FilterModel();
 const offersModel = new OffersModel();
 const tripInfoModel = new TripInfoModel();
 const destinationsModel = new DestinationsModel();
 
-
 const navigationComponent = new Navigation();
 
-// CREATE PRESENTER
 const eventsPresenter = new TripPresenter(tripEventsElement, filtersContainer, eventsModel, filterModel, offersModel, destinationsModel, api);
 const filterPresenter = new FiltersPresenter(filtersContainer, filterModel, eventsModel);
-const tripInfoPresenter = new TripInfoPresenter(tripInfoElement, eventsModel, tripInfoModel); // перенести рендеринг в api.getEvents()
+const tripInfoPresenter = new TripInfoPresenter(tripInfoElement, eventsModel, tripInfoModel);
 
-// PRESENTER INITIALIZATION
+addButton.disabled = true;
+
 eventsPresenter.init();
 filterPresenter.init();
 tripInfoPresenter.init();
@@ -55,8 +50,6 @@ addButton.addEventListener('click', (evt) => {
   eventsPresenter.createEvent();
   addButton.disabled = true;
 });
-
-// NAVIGATION & STATISTICS
 
 let statisticsComponent = null;
 
@@ -97,6 +90,7 @@ Promise.all([
     destinationsModel.setDestinations(UpdateType.INIT, destinations);
     render(navigationContainer, navigationComponent, RenderPosition.BEFOREEND);
     navigationComponent.setNavigationClickHandler(handleSiteNavigationClick);
+    addButton.disabled = false;
   })
   .catch(() => {
     eventsModel.setEvents(UpdateType.INIT, []);

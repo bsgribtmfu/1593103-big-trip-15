@@ -1,13 +1,12 @@
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
+
 import { humanizeEventDate } from '../utils/date.js';
-import { getLastWord, getOffersByType, getDestinationByName } from '../utils/common.js';
+import { ObjectKeyName } from '../constans.js';
+import { getLastWord, getElementsByType } from '../utils/common.js';
 
 import Smart from './smart.js';
 
-import flatpickr from 'flatpickr';
-
-import '../../node_modules/flatpickr/dist/flatpickr.min.css';
-
-// ---------- TYPE LIST ----------
 const typeItemTemplate = (type, currentType, id) => (
   `<div class="event__type-item">
     <input id="event-type-${type}-${id}" class="event__type-input visually-hidden" type="radio" name="event-type" value="${type}" ${type === currentType ? 'checked' : ''}>
@@ -17,7 +16,6 @@ const typeItemTemplate = (type, currentType, id) => (
 
 const generateTypeItems = (allOffers, currentType) => allOffers.map((offer, id) => typeItemTemplate(offer.type, currentType, id)).join('');
 
-// ---------- PHOTOS ----------
 const generateDestinationPhotos = (pictures) => {
 
   const pucturesElements = pictures.map((picture) => `<img class="event__photo" src="${picture.src}" alt=${picture.description}">`);
@@ -45,7 +43,6 @@ const generateDistanationSection = (distanation) => {
   );
 };
 
-// ---------- OFFERS FOR POINT ----------
 const generateOffers = (pointOffers, avalibleOffers, isDisabled) => {
 
   const isChecked = (offer) => pointOffers.map((pointOffer) => pointOffer.title).includes(offer.title) ? 'checked' : '';
@@ -95,8 +92,9 @@ const generateForm = (data, avalibleOffers, destinations) => {
     isDeleting,
   } = data;
 
+
   const destinationOptions = generateDistanations(destinations);
-  const avalibleOffersByType = avalibleOffers.length ? getOffersByType(type, avalibleOffers) : [];
+  const avalibleOffersByType = avalibleOffers.length ? getElementsByType(type, avalibleOffers, ObjectKeyName.TYPE).offers : [];
 
   return (
     `<li class="trip-events__item">
@@ -191,7 +189,7 @@ export default class EditForm extends Smart {
     this.updateData(EditForm.parseEventToData(event));
   }
 
-  restoreHandlers() { // restore handlers | метод унаследован от класса Smart
+  restoreHandlers() {
     this._setDatepicker();
     this._setInnerHandlers();
     this.setEditDeliteClickHandler(this._callback._deleteSubmit);
@@ -203,9 +201,8 @@ export default class EditForm extends Smart {
     evt.preventDefault();
     const value = evt.target.parentElement.querySelector('input').value;
 
-    this.updateData({ // здесь ошибка, модифицирует обьект точки а не обьект структуры оферса
+    this.updateData({
       type: value,
-      // offers: findOfferByType(value, this._offers), // поиск доступных офферов у точки
     });
   }
 
@@ -223,7 +220,7 @@ export default class EditForm extends Smart {
   }
 
   _eventDestinationChangeHandler(evt) {
-    const selectedDestination = getDestinationByName(evt.target.value, this._destinations);
+    const selectedDestination = getElementsByType(evt.target.value, this._destinations, ObjectKeyName.NAME);
 
     if(!selectedDestination) {
       this.getElement().querySelector('.event__save-btn').disabled = true;
@@ -245,7 +242,7 @@ export default class EditForm extends Smart {
     evt.target.reportValidity();
   }
 
-  _eventPriceChangeHandler(evt) { // change input price
+  _eventPriceChangeHandler(evt) {
     this.updateData({
       'base_price': Number(evt.target.value),
     }, true);
@@ -279,7 +276,7 @@ export default class EditForm extends Smart {
     const selectedOffers = Array.from(this.getElement()
       .querySelectorAll('.event__offer-checkbox'))
       .filter((offer) => offer.checked === true)
-      .map((offer) => ({ //  or DOMStringMap to Object -> Object.assign({}, element.dataset);
+      .map((offer) => ({ // DOMStringMap to Object -> Object.assign({}, element.dataset);
         title: offer.dataset.title,
         price: Number(offer.dataset.price),
       }));
@@ -294,10 +291,9 @@ export default class EditForm extends Smart {
   _formDeleteHandler(evt) {
     evt.preventDefault();
     this._callback._deleteSubmit(EditForm.parseDataToEvent(this._data));
-    // this._element = null;
   }
 
-  _setInnerHandlers() { // обработчики событий View
+  _setInnerHandlers() {
     this.getElement().querySelector('.event__type-list').addEventListener('click', this._eventTypeSelectHandler);
     this.getElement().querySelector('.event__input--destination').addEventListener('input', this._eventDestinationInputHandler);
     this.getElement().querySelector('.event__input--destination').addEventListener('change', this._eventDestinationChangeHandler);
@@ -349,17 +345,17 @@ export default class EditForm extends Smart {
     );
   }
 
-  setEditClickHandler(callback) { // button 'rollup'
+  setEditClickHandler(callback) {
     this._callback.editClick = callback;
     this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._editClickHandler);
   }
 
-  setEditSubmitHandler(callback) { // button 'Save'
+  setEditSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.getElement().querySelector('form').addEventListener('submit', this._formSubmitHandler);
   }
 
-  setEditDeliteClickHandler(callback) { // button 'Delete'
+  setEditDeliteClickHandler(callback) {
     this._callback._deleteSubmit = callback;
     this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formDeleteHandler);
   }

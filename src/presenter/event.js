@@ -34,12 +34,12 @@ export default class EventPresenter {
     this._eventComponent = new Event(event);
     this._editFormComponent = new EditForm(event, offers, destinations);
 
-    this._eventComponent.setEditClickHandler(this._replaceCardToForm);        // event -> form
-    this._eventComponent.setFavoriteClickHandler(this._handleFavoriteClick);  // event favorite button click
+    this._eventComponent.setEditClickHandler(this._replaceCardToForm);
+    this._eventComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
-    this._editFormComponent.setEditClickHandler(this._handleEditClickRollup); // form -> event  | rollup
-    this._editFormComponent.setEditSubmitHandler(this._handleEditSubmit);     // save | submit
-    this._editFormComponent.setEditDeliteClickHandler(this._deleteEditForm);  // form -> event  | remove
+    this._editFormComponent.setEditClickHandler(this._handleEditClickRollup);
+    this._editFormComponent.setEditSubmitHandler(this._handleEditSubmit);
+    this._editFormComponent.setEditDeliteClickHandler(this._deleteEditForm);
 
     if (prevEventComponent === null || prevEditFormComponent === null) {
       render(this._eventsListContainer, this._eventComponent, RenderPosition.BEFOREEND);
@@ -66,7 +66,7 @@ export default class EventPresenter {
   }
 
   destroy() {
-    removeElement(this._eventComponent);  // this._element = null AND remove element from DOM
+    removeElement(this._eventComponent);
     removeElement(this._editFormComponent);
   }
 
@@ -76,8 +76,6 @@ export default class EventPresenter {
       UpdateType.MINOR,
       event,
     );
-
-    // removeElement(this._editFormComponent); // this._element = null AND remove element from DOM
   }
 
   _escKeyDownHandler(evt) {
@@ -88,14 +86,14 @@ export default class EventPresenter {
     }
   }
 
-  _replaceCardToForm() { // call-back function to edit form
+  _replaceCardToForm() {
     replaceElement(this._editFormComponent, this._eventComponent);
     document.addEventListener('keydown', this._escKeyDownHandler);
     this._changeMode();
     this._mode = Mode.EDITING;
   }
 
-  _replaceFormToCard() { // call-back function to event
+  _replaceFormToCard() {
     replaceElement(this._eventComponent, this._editFormComponent);
     document.removeEventListener('keydown', this._escKeyDownHandler);
     this._mode = Mode.DEFAULT;
@@ -139,14 +137,12 @@ export default class EventPresenter {
     this._replaceFormToCard();
   }
 
-  _handleEditSubmit(event) { // button save
+  _handleEditSubmit(event) {
     this._changeData(
       UserAction.UPDATE_EVENT,
       UpdateType.MINOR,
       event,
     );
-
-    // this._replaceFormToCard();
   }
 
   _handleFavoriteClick() {
