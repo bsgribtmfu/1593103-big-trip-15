@@ -1,20 +1,21 @@
+import dayjs from 'dayjs';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
-import { humanizeEventDate } from '../utils/date.js';
 import { ObjectKeyName } from '../constans.js';
+import { humanizeEventDate } from '../utils/date.js';
 import { getLastWord, getElementsByType } from '../utils/common.js';
 
 import Smart from './smart.js';
 
 const typeItemTemplate = (type, currentType, id) => (
   `<div class="event__type-item">
-    <input id="event-type-${type}-${id}" class="event__type-input visually-hidden" type="radio" name="event-type" value="${type}" ${type === currentType ? 'checked' : ''}>
+    <input id="event-type-${type}-${id}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}" ${type === currentType ? 'checked' : ''}>
     <label class="event__type-label event__type-label--${type}" for="event-type-${type}-${id}">${type}</label>
   </div>`
 );
 
-const generateTypeItems = (allOffers, currentType) => allOffers.map((offer, id) => typeItemTemplate(offer.type, currentType, id)).join('');
+const generateTypeItems = (offers, currentType) => offers.map((offer, id) => typeItemTemplate(offer.type, currentType, id)).join('');
 
 const generateDestinationPhotos = (pictures) => {
 
@@ -30,26 +31,25 @@ const generateDestinationPhotos = (pictures) => {
 };
 
 const generateDistanationSection = (distanation) => {
+
   if(!distanation.description || !distanation.pictures) {
     return '';
   }
 
   return (
     `<section class="event__section event__section--destination">
-      <h3 class="event__section-title event__section-title--destination">Destination</h3>
+      <h3 class="event__section-title  event__section-title--destination">Destination</h3>
       <p class="event__destination-description">${distanation.description}</p>
       ${generateDestinationPhotos(distanation.pictures)}
     </section>`
   );
 };
 
-const generateOffers = (pointOffers, avalibleOffers, isDisabled) => {
-
-  const isChecked = (offer) => pointOffers.map((pointOffer) => pointOffer.title).includes(offer.title) ? 'checked' : '';
+const generateOffers = (avalibleOffers) => {
 
   const offersElements = avalibleOffers.map((offer, id) => (
     `<div class="event__offer-selector">
-      <input class="event__offer-checkbox visually-hidden" data-title="${offer.title}" data-price="${offer.price}" id="event-offer-${getLastWord(offer.title)}-${id}" type="checkbox" name="event-offer-${getLastWord(offer.title)}" ${isChecked(offer)} ${isDisabled ? 'disabled' : ''}>
+      <input class="event__offer-checkbox visually-hidden" data-title="${offer.title}" data-price="${offer.price}" id="event-offer-${getLastWord(offer.title)}-${id}" type="checkbox" name="event-offer-${getLastWord(offer.title)}">
       <label class="event__offer-label" for="event-offer-${getLastWord(offer.title)}-${id}">
         <span class="event__offer-title">${offer.title}</span>
         &plus;&euro;&nbsp;
@@ -61,17 +61,20 @@ const generateOffers = (pointOffers, avalibleOffers, isDisabled) => {
   return offersElements.join('');
 };
 
-const generateOffersSection = (offers, avalibleOffersByType, isDisabled) => {
+const generateOffersSection = (avalibleOffersByType) => {
+
+  const offersElements = generateOffers(avalibleOffersByType);
+
 
   if(!avalibleOffersByType.length) {
     return '';
   }
 
   return (
-    `<section class="event__section event__section--offers">
-      <h3 class="event__section-title event__section-title--offers">Offers</h3>
+    `<section class="event__section  event__section--offers">
+      <h3 class="event__section-title  event__section-title--offers">Offers</h3>
       <div class="event__available-offers">
-        ${generateOffers(offers, avalibleOffersByType, isDisabled)}
+        ${offersElements}
       </div>
     </section>`
   );
@@ -81,17 +84,17 @@ const generateDistanations = (destinations) => destinations.map((destination) =>
 
 const generateForm = (data, avalibleOffers, destinations) => {
   const {
-    base_price: basePrice,
-    date_from: dateFrom,
-    date_to: dateTo,
+    'base_price': basePrice,
+    'date_from': dateFrom,
+    'date_to': dateTo,
     destination,
-    offers,
     type,
     isDisabled,
     isSaving,
-    isDeleting,
+    isCanceling,
   } = data;
 
+  const isDisabledButton = !destination.name || !basePrice ? 'disabled' : '';
 
   const destinationOptions = generateDistanations(destinations);
   const avalibleOffersByType = avalibleOffers.length ? getElementsByType(type, avalibleOffers, ObjectKeyName.TYPE).offers : [];
@@ -127,10 +130,10 @@ const generateForm = (data, avalibleOffers, destinations) => {
 
           <div class="event__field-group  event__field-group--time">
             <label class="visually-hidden" for="event-start-time-1">From</label>
-            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizeEventDate(dateFrom, 'DD/MM/YY')} ${humanizeEventDate(dateFrom, 'HH:mm')}" ${isDisabled ? 'disabled' : ''}>
+            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" data-time="${dateFrom.toISOString()}" value="${humanizeEventDate(dateFrom, 'DD/MM/YY HH:mm')}" ${isDisabled ? 'disabled' : ''}>
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">To</label>
-            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizeEventDate(dateTo, 'DD/MM/YY')} ${humanizeEventDate(dateTo, 'HH:mm')}" ${isDisabled ? 'disabled' : ''}>
+            <input class="event__input event__input--time" id="event-end-time-1" type="text" name="event-end-time" data-time="${dateTo.toISOString()}" value="${humanizeEventDate(dateTo, 'DD/MM/YY HH:mm')}" ${isDisabled ? 'disabled' : ''}>
           </div>
 
           <div class="event__field-group  event__field-group--price">
@@ -141,14 +144,11 @@ const generateForm = (data, avalibleOffers, destinations) => {
             <input class="event__input event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}" ${isDisabled ? 'disabled' : ''}>
           </div>
 
-          <button class="event__save-btn btn btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
-          <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>${isDeleting ? 'Deleting...' : 'Delete'}</button>
-          <button class="event__rollup-btn" type="button" ${isDisabled ? 'disabled' : ''}>
-            <span class="visually-hidden">Open event</span>
-          </button>
+          <button class="event__save-btn btn btn--blue" type="submit" ${isDisabledButton}>${isSaving ? 'Saving...' : 'Save'}</button>
+          <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>${isCanceling ? 'Canceling...' : 'Cancel'}</button>
         </header>
         <section class="event__details">
-          ${generateOffersSection(offers, avalibleOffersByType, isDisabled)}
+          ${generateOffersSection(avalibleOffersByType)}
           ${generateDistanationSection(destination)}
         </section>
       </form>
@@ -156,22 +156,21 @@ const generateForm = (data, avalibleOffers, destinations) => {
   );
 };
 
-export default class EditForm extends Smart {
-  constructor (event, offers, destinations) {
+export default class NewEvent extends Smart {
+  constructor (event, offers, destination) {
     super();
+    this._data = NewEvent.parseEventToData(event);
     this._offers = offers;
-    this._destinations = destinations;
+    this._destination = destination;
 
-    this._data = EditForm.parseEventToData(event);
     this._datepickerStart = null;
     this._datepickerEnd = null;
 
     this._eventTypeSelectHandler = this._eventTypeSelectHandler.bind(this);
     this._eventDestinationInputHandler = this._eventDestinationInputHandler.bind(this);
     this._eventDestinationChangeHandler = this._eventDestinationChangeHandler.bind(this);
-    this._eventPriceChangeHandler = this._eventPriceChangeHandler.bind(this);
     this._eventPriceInputHandler = this._eventPriceInputHandler.bind(this);
-    this._editClickHandler = this._editClickHandler.bind(this);
+    this._eventPriceChangeHandler = this._eventPriceChangeHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._formDeleteHandler = this._formDeleteHandler.bind(this);
     this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
@@ -182,11 +181,11 @@ export default class EditForm extends Smart {
   }
 
   getTemplate() {
-    return generateForm(this._data, this._offers, this._destinations);
+    return generateForm(this._data, this._offers, this._destination);
   }
 
   reset(event) {
-    this.updateData(EditForm.parseEventToData(event));
+    this.updateData(NewEvent.parseEventToData(event));
   }
 
   restoreHandlers() {
@@ -194,7 +193,6 @@ export default class EditForm extends Smart {
     this._setInnerHandlers();
     this.setEditDeliteClickHandler(this._callback._deleteSubmit);
     this.setEditSubmitHandler(this._callback.formSubmit);
-    this.setEditClickHandler(this._callback.editClick);
   }
 
   _eventTypeSelectHandler(evt) {
@@ -203,33 +201,22 @@ export default class EditForm extends Smart {
 
     this.updateData({
       type: value,
+      offers: getElementsByType(value, this._offers, ObjectKeyName.TYPE).offers,
     });
   }
 
   _eventDestinationInputHandler(evt) {
-    if(!evt.target.value.length) {
-      evt.target.setCustomValidity('Поле не может быть пустым, введите названия города или выберите из списка.');
-      this.getElement().querySelector('.event__save-btn').disabled = true;
-    }
-    else {
-      this.getElement().querySelector('.event__save-btn').disabled = false;
-      evt.target.setCustomValidity('');
-    }
-
-    evt.target.reportValidity();
+    evt.target.value = evt.target.value.replace(/[^a-zA-Z\s]/, '');
   }
 
   _eventDestinationChangeHandler(evt) {
-    const selectedDestination = getElementsByType(evt.target.value, this._destinations, ObjectKeyName.NAME);
+    const selectedDestination = getElementsByType(evt.target.value, this._destination, ObjectKeyName.NAME);
 
     if(!selectedDestination) {
-      this.getElement().querySelector('.event__save-btn').disabled = true;
       evt.target.setCustomValidity('Данный город недоступен для выбора, используйте другой');
     }
     else {
       evt.target.setCustomValidity('');
-
-      this.getElement().querySelector('.event__save-btn').disabled = false;
 
       this.updateData({
         destination: {
@@ -239,13 +226,8 @@ export default class EditForm extends Smart {
         },
       });
     }
-    evt.target.reportValidity();
-  }
 
-  _eventPriceChangeHandler(evt) {
-    this.updateData({
-      'base_price': Number(evt.target.value),
-    }, true);
+    evt.target.reportValidity();
   }
 
   _eventPriceInputHandler(evt) {
@@ -254,20 +236,23 @@ export default class EditForm extends Smart {
     const price = Number(evt.target.value);
 
     if (!price || price === 0) {
-      this.getElement().querySelector('.event__save-btn').disabled = true;
       evt.target.setCustomValidity('Цена не может быть пустым полем или равна нулю.');
     }
     else {
-      this.getElement().querySelector('.event__save-btn').disabled = false;
       evt.target.setCustomValidity('');
+
+      this.updateData({
+        'base_price': price,
+      }, true);
     }
 
     evt.target.reportValidity();
   }
 
-  _editClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.editClick();
+  _eventPriceChangeHandler(evt) {
+    this.updateData({
+      'base_price': Number(evt.target.value),
+    });
   }
 
   _formSubmitHandler(evt) {
@@ -276,7 +261,7 @@ export default class EditForm extends Smart {
     const selectedOffers = Array.from(this.getElement()
       .querySelectorAll('.event__offer-checkbox'))
       .filter((offer) => offer.checked === true)
-      .map((offer) => ({ // DOMStringMap to Object -> Object.assign({}, element.dataset);
+      .map((offer) => ({ //  or DOMStringMap to Object -> Object.assign({}, element.dataset);
         title: offer.dataset.title,
         price: Number(offer.dataset.price),
       }));
@@ -285,20 +270,21 @@ export default class EditForm extends Smart {
       offers: selectedOffers,
     });
 
-    this._callback.formSubmit(EditForm.parseDataToEvent(this._data));
+    this._callback.formSubmit(NewEvent.parseDataToEvent(this._data));
   }
 
   _formDeleteHandler(evt) {
     evt.preventDefault();
-    this._callback._deleteSubmit(EditForm.parseDataToEvent(this._data));
+    this._callback._deleteSubmit(NewEvent.parseDataToEvent(this._data));
+    this._element = null;
   }
 
   _setInnerHandlers() {
     this.getElement().querySelector('.event__type-list').addEventListener('click', this._eventTypeSelectHandler);
     this.getElement().querySelector('.event__input--destination').addEventListener('input', this._eventDestinationInputHandler);
     this.getElement().querySelector('.event__input--destination').addEventListener('change', this._eventDestinationChangeHandler);
-    this.getElement().querySelector('.event__input--price').addEventListener('change', this._eventPriceChangeHandler);
     this.getElement().querySelector('.event__input--price').addEventListener('input', this._eventPriceInputHandler);
+    this.getElement().querySelector('.event__input--price').addEventListener('change', this._eventPriceChangeHandler);
   }
 
   removeElement() {
@@ -320,13 +306,13 @@ export default class EditForm extends Smart {
 
   _setDatepicker() {
     this._clearDatepicker();
+
     this._datepickerStart = flatpickr(
       this.getElement().querySelector('#event-start-time-1'),
       {
         dateFormat: 'd/m/y H:i',
         enableTime: true,
         'time_24hr': true,
-        maxDate: this._data.date_to,
         defaultDate: this._data.date_from,
         onChange: this._startDateChangeHandler,
       },
@@ -345,11 +331,6 @@ export default class EditForm extends Smart {
     );
   }
 
-  setEditClickHandler(callback) {
-    this._callback.editClick = callback;
-    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._editClickHandler);
-  }
-
   setEditSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.getElement().querySelector('form').addEventListener('submit', this._formSubmitHandler);
@@ -361,9 +342,23 @@ export default class EditForm extends Smart {
   }
 
   _startDateChangeHandler([dateFrom]) {
-    this.updateData({
-      'date_from': dateFrom,
-    });
+    const datatime = this.getElement().querySelector('#event-end-time-1').dataset.time;
+    const dateTo = dayjs(dayjs(datatime)).toDate();
+
+    if(dateFrom > dateTo) {
+      const newDateTo = dayjs(dateFrom).add(10, 'minute').toDate();
+      this._datepickerEnd.config.minDate = newDateTo;
+      this._datepickerEnd.config.defaultDate = newDateTo;
+
+      this.updateData({
+        'date_from': dateFrom,
+        'date_to': newDateTo,
+      });
+    } else {
+      this.updateData({
+        'date_from': dateFrom,
+      });
+    }
   }
 
   _endDateChangeHandler([dateTo]) {
@@ -379,20 +374,17 @@ export default class EditForm extends Smart {
       {
         isDisabled: false,
         isSaving: false,
-        isDeleting: false,
+        isCanceling: false,
       },
     );
   }
 
   static parseDataToEvent(data) {
-    data =  Object.assign(
-      {},
-      data,
-    );
+    data = Object.assign({}, data);
 
     delete data.isDisabled;
     delete data.isSaving;
-    delete data.isDeleting;
+    delete data.isCanceling;
 
     return data;
   }

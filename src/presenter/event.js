@@ -1,12 +1,8 @@
 import { render, RenderPosition, replaceElement, removeElement } from '../utils/render.js';
+import { UserAction, UpdateType, Mode, State } from '../constans.js';
 
 import Event from '../view/event.js';
 import EditForm from '../view/edit-form.js';
-
-const Mode = {
-  DEFAULT: 'DEFAULT',
-  EDITING: 'EDITING',
-};
 
 export default class EventPresenter {
   constructor(eventsListContainer, changeData, changeMode) {
@@ -24,23 +20,26 @@ export default class EventPresenter {
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
     this._handleEditClickRollup = this._handleEditClickRollup.bind(this);
     this._handleEditSubmit = this._handleEditSubmit.bind(this);
-    this._removeEditForm = this._removeEditForm.bind(this);
+    this._deleteEditForm = this._deleteEditForm.bind(this);
   }
 
-  init(event) {
+  init(event, offers, destinations) {
     this._event = event;
+    this._offers = offers;
+    this._destinations = destinations;
 
     const prevEventComponent = this._eventComponent;
     const prevEditFormComponent = this._editFormComponent;
 
     this._eventComponent = new Event(event);
-    this._editFormComponent = new EditForm(event);
+    this._editFormComponent = new EditForm(event, offers, destinations);
 
-    this._eventComponent.setEditClickHandler(this._replaceCardToForm);        // event -> form
-    this._editFormComponent.setEditClickHandler(this._handleEditClickRollup);     // form -> event  | main
-    this._editFormComponent.setEditSubmitHandler(this._handleEditSubmit);     // save | submit
-    this._editFormComponent.setEditDeliteClickHandler(this._removeEditForm);  // form -> event  | delite
-    this._eventComponent.setFavoriteClickHandler(this._handleFavoriteClick);  // event favorite button click
+    this._eventComponent.setEditClickHandler(this._replaceCardToForm);
+    this._eventComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+
+    this._editFormComponent.setEditClickHandler(this._handleEditClickRollup);
+    this._editFormComponent.setEditSubmitHandler(this._handleEditSubmit);
+    this._editFormComponent.setEditDeliteClickHandler(this._deleteEditForm);
 
     if (prevEventComponent === null || prevEditFormComponent === null) {
       render(this._eventsListContainer, this._eventComponent, RenderPosition.BEFOREEND);
@@ -53,9 +52,10 @@ export default class EventPresenter {
 
     if (this._mode === Mode.EDITING) {
       replaceElement(this._editFormComponent, prevEditFormComponent);
+      this._mode = Mode.DEFAULT;
     }
 
-    removeElement(prevEventComponent);     // this._element = null AND remove element from DOM
+    removeElement(prevEventComponent);
     removeElement(prevEditFormComponent);
   }
 
@@ -66,12 +66,16 @@ export default class EventPresenter {
   }
 
   destroy() {
-    removeElement(this._eventComponent);  // this._element = null AND remove element from DOM
+    removeElement(this._eventComponent);
     removeElement(this._editFormComponent);
   }
 
-  _removeEditForm() {
-    removeElement(this._editFormComponent); // this._element = null AND remove element from DOM
+  _deleteEditForm(event) {
+    this._changeData(
+      UserAction.DELETE_EVENT,
+      UpdateType.MINOR,
+      event,
+    );
   }
 
   _escKeyDownHandler(evt) {
@@ -82,17 +86,50 @@ export default class EventPresenter {
     }
   }
 
-  _replaceCardToForm() { // call-back function to edit form
+  _replaceCardToForm() {
     replaceElement(this._editFormComponent, this._eventComponent);
     document.addEventListener('keydown', this._escKeyDownHandler);
     this._changeMode();
     this._mode = Mode.EDITING;
   }
 
-  _replaceFormToCard() { // call-back function to event
+  _replaceFormToCard() {
     replaceElement(this._eventComponent, this._editFormComponent);
     document.removeEventListener('keydown', this._escKeyDownHandler);
     this._mode = Mode.DEFAULT;
+  }
+
+  setViewState(state) {
+    if (this._mode === Mode.DEFAULT) {
+      return;
+    }
+
+    const resetFormState = () => {
+      this._editFormComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    switch (state) {
+      case State.SAVING:
+        this._editFormComponent.updateData({
+          isDisabled: true,
+          isSaving: true,
+        });
+        break;
+      case State.DELETING:
+        this._editFormComponent.updateData({
+          isDisabled: true,
+          isDeleting: true,
+        });
+        break;
+      case State.ABORTING:
+        this._eventComponent.shake(resetFormState);
+        this._editFormComponent.shake(resetFormState);
+        break;
+    }
   }
 
   _handleEditClickRollup() {
@@ -101,12 +138,17 @@ export default class EventPresenter {
   }
 
   _handleEditSubmit(event) {
-    this._changeData(event);
-    this._replaceFormToCard();
+    this._changeData(
+      UserAction.UPDATE_EVENT,
+      UpdateType.MINOR,
+      event,
+    );
   }
 
   _handleFavoriteClick() {
     this._changeData(
+      UserAction.UPDATE_EVENT,
+      UpdateType.PATCH,
       Object.assign(
         {},
         this._event,

@@ -2,7 +2,7 @@ import { humanizeEventDate, getDuration, humanizeEventDurationDate } from '../ut
 
 import Abstract from './abstract.js';
 
-const generateCheckedOffers = (offers) => { // draft, дописать логику проверка на checked
+const generateCheckedOffers = (offers) => {
   if(!offers.length) {
     return '';
   }
